@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 const images = [
   "/assets/images/Banner-1.jpg",
@@ -8,41 +9,54 @@ const images = [
 ];
 
 const Slider: React.FC = () => {
-  // currentIndex is the virtual index in the duplicated array.
   const [currentIndex, setCurrentIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  // Duplicate images for infinite effect.
-  const slides = [...images, ...images];
-
-  // Get container width on mount.
+  // Update width on window resize and initial load
   useEffect(() => {
-    if (containerRef.current) {
-      setWidth(containerRef.current.offsetWidth);
-    }
+    const updateWidth = () => {
+      if (containerRef.current) {
+        setWidth(containerRef.current.offsetWidth);
+      }
+    };
+    
+    // Initial update
+    updateWidth();
+    
+    // Add resize listener
+    window.addEventListener('resize', updateWidth);
+    
+    // Set loaded after a slight delay to ensure images are processed
+    const timer = setTimeout(() => setIsLoaded(true), 500);
+    
+    return () => {
+      window.removeEventListener('resize', updateWidth);
+      clearTimeout(timer);
+    };
   }, []);
 
-  // Auto slide every 3 seconds.
+  // Auto slide every 3 seconds, but only after width is determined
   useEffect(() => {
+    if (width === 0) return;
+    
     const interval = setInterval(() => {
       handleNext();
     }, 3000);
+    
     return () => clearInterval(interval);
   }, [currentIndex, width]);
 
   const handleNext = () => {
-    setCurrentIndex((prev) => prev + 1);
+    setCurrentIndex((prev) => (prev + 1) % images.length);
   };
 
   const handlePrev = () => {
-    setCurrentIndex((prev) => prev - 1);
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
-  const handleDragEnd = (
-    _: any,
-    info: { offset: { x: number } }
-  ) => {
+  const handleDragEnd = (_: any, info: { offset: { x: number } }) => {
     if (info.offset.x < -50) {
       handleNext();
     } else if (info.offset.x > 50) {
@@ -50,57 +64,43 @@ const Slider: React.FC = () => {
     }
   };
 
-  // When the virtual index moves beyond the originals,
-  // reset the index (after a short delay so that the transition finishes).
-  useEffect(() => {
-    if (width === 0) return;
-    if (currentIndex >= images.length) {
-      setTimeout(() => {
-        // Without transition, reset index to equivalent position.
-        setCurrentIndex(currentIndex - images.length);
-      }, 400);
-    } else if (currentIndex < 0) {
-      setTimeout(() => {
-        setCurrentIndex(currentIndex + images.length);
-      }, 400);
-    }
-  }, [currentIndex, images.length, width]);
-
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[175spx] overflow-hidden rounded-[5px]"
+      className="relative w-full h-[175px] overflow-hidden rounded-[5px]"
     >
-      <motion.div
-        className="flex"
-        drag="x"
-        // Allow dragging freely in both directions.
-        dragConstraints={{ left: -width * (slides.length - 1), right: 0 }}
-        dragElastic={0.2}
-        onDragEnd={handleDragEnd}
-        animate={{ x: -currentIndex * width }}
-        transition={{ duration: 0.4, ease: "easeInOut" }}
-      >
-        {slides.map((src, i) => (
-          <img
-            key={i}
-            src={src}
-            alt={`Slide ${i + 1}`}
-            className="w-full h-full flex-shrink-0 rounded-[5px] object-cover"
-          />
-        ))}
-      </motion.div>
+      {isLoaded && width > 0 && (
+        <motion.div
+          className="flex relative h-full"
+          drag="x"
+          dragConstraints={{ left: -width * (images.length - 1), right: 0 }}
+          dragElastic={0.2}
+          onDragEnd={handleDragEnd}
+          animate={{ x: -currentIndex * width }}
+          transition={{ duration: 0.4, ease: "easeInOut" }}
+        >
+          {images.map((src, i) => (
+            <div key={i} className="relative flex-shrink-0" style={{ width: `${width}px`, height: '100%' }}>
+              <Image 
+                src={src}
+                alt={`Slide ${i + 1}`}
+                fill
+                className="object-cover rounded-[5px]"
+                priority={i === 0}
+              />
+            </div>
+          ))}
+        </motion.div>
+      )}
 
-      {/* Navigation Dots (only for original images) */}
-      <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2">
+      {/* Navigation Dots */}
+      <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
         {images.map((_, i) => (
           <span
             key={i}
             onClick={() => setCurrentIndex(i)}
             className={`w-[7px] h-[7px] rounded-full cursor-pointer transition-all ${
-              i === (currentIndex % images.length)
-                ? "bg-black scale-125"
-                : "bg-gray-400"
+              i === currentIndex ? "bg-black scale-125" : "bg-gray-400"
             }`}
           />
         ))}

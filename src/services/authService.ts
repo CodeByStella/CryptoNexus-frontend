@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.SERVER_RUL; 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"; 
 
 const authService = {
   setToken: (token: string) => {

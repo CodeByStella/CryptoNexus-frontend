@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 interface DepositAddress {
   _id: string;
@@ -19,9 +19,9 @@ const RechargeApprovalPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const BACKEND_URL = process.env.SERVER_RUL;
+  const BACKEND_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
-  const fetchDeposits = async () => {
+  const fetchDeposits = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -43,9 +43,9 @@ const RechargeApprovalPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [BACKEND_URL]); // Dependency: BACKEND_URL
 
-  const handleStatusUpdate = async (depositId: string, status: "accepted" | "rejected") => {
+  const handleStatusUpdate = useCallback(async (depositId: string, status: "accepted" | "rejected") => {
     try {
       const authToken = localStorage.getItem("token");
       if (!authToken) {
@@ -68,11 +68,11 @@ const RechargeApprovalPage = () => {
     } catch (err: any) {
       setError(err.message || `An error occurred while updating the deposit status to ${status}`);
     }
-  };
+  }, [fetchDeposits, BACKEND_URL]); // Dependencies: fetchDeposits, BACKEND_URL
 
   useEffect(() => {
     fetchDeposits();
-  }, []);
+  }, [fetchDeposits]); // Dependency: fetchDeposits
 
   if (loading) return <div className="min-h-screen bg-gray-100 flex items-center justify-center">Loading...</div>;
   if (error) return <div className="min-h-screen bg-gray-100 flex items-center justify-center text-red-500">{error}</div>;

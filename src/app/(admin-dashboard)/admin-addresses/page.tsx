@@ -1,9 +1,9 @@
+// src/app/(admin-dashboard)/admin-addresses/page.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { fetchAddresses, updateAddress, addToken } from "@/lib/deposit-address";
 
-// Types matching your existing model
 interface AddressData {
   chain: string;
   address: string;
@@ -18,46 +18,11 @@ interface DepositAddress {
   updatedAt: string;
 }
 
-// Mock API functions for managing addresses
-
-const BASE_URL = process.env.SERVER_RUL;
-
-const fetchAddresses = async () => {
-  const response = await axios.get(`${BASE_URL}/api/admin/deposit-addresses`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  });
-  return response.data;
-};
-
-const updateAddress = async (depositAddressId: string, data: { addresses: AddressData[] }) => {
-  const response = await axios.put(`${BASE_URL}/api/admin/deposit-addresses/${depositAddressId}`, data, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  });
-  return response.data;
-};
-
-const addToken = async (data: { token: string; addresses: AddressData[] }) => {
-  const response = await axios.post(`${BASE_URL}/api/admin/deposit-addresses`, data, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  });
-  return response.data;
-};
-
-// export { fetchAddresses, updateAddress, addToken };
-
-
 const AdminDepositAddresses = () => {
   const [addresses, setAddresses] = useState<DepositAddress[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // State for editing and adding new tokens
   const [editingTokenId, setEditingTokenId] = useState<string | null>(null);
   const [showAddTokenForm, setShowAddTokenForm] = useState(false);
   const [newTokenData, setNewTokenData] = useState<{ token: string; addresses: AddressData[] }>({
@@ -65,7 +30,6 @@ const AdminDepositAddresses = () => {
     addresses: [{ chain: "", address: "" }],
   });
 
-  // Load addresses on component mount
   useEffect(() => {
     const loadAddresses = async () => {
       try {
@@ -83,28 +47,21 @@ const AdminDepositAddresses = () => {
     loadAddresses();
   }, []);
 
-  // Handle updating an address for a token
   const handleSaveChanges = async (depositAddress: DepositAddress) => {
     try {
       setLoading(true);
       await updateAddress(depositAddress._id, { addresses: depositAddress.addresses });
-      
-      // Refresh the data
       const updatedAddresses = await fetchAddresses();
       setAddresses(updatedAddresses);
-      
       setEditingTokenId(null);
-    //   toast.success("Addresses updated successfully");/
     } catch (err) {
       setError("Failed to update addresses");
-    //   toast.error("Failed to update addresses");
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle adding a new chain-address pair to a token
   const handleAddChainAddress = (tokenId: string) => {
     setAddresses(addresses.map(addr => {
       if (addr._id === tokenId) {
@@ -117,7 +74,6 @@ const AdminDepositAddresses = () => {
     }));
   };
 
-  // Handle removing a chain-address pair
   const handleRemoveChainAddress = (tokenId: string, addressIndex: number) => {
     setAddresses(addresses.map(addr => {
       if (addr._id === tokenId) {
@@ -132,7 +88,6 @@ const AdminDepositAddresses = () => {
     }));
   };
 
-  // Handle updating an address field
   const handleAddressChange = (
     tokenId: string, 
     addressIndex: number, 
@@ -155,40 +110,28 @@ const AdminDepositAddresses = () => {
     }));
   };
 
-  // Handle adding a new token
   const handleAddToken = async () => {
     try {
       setLoading(true);
-      
       if (!newTokenData.token || newTokenData.addresses.some(a => !a.chain || !a.address)) {
-        // toast.error("Please fill all fields");
         return;
       }
-      
       await addToken(newTokenData);
-      
-      // Refresh data
       const updatedAddresses = await fetchAddresses();
       setAddresses(updatedAddresses);
-      
-      // Reset form
       setNewTokenData({
         token: "",
         addresses: [{ chain: "", address: "" }]
       });
       setShowAddTokenForm(false);
-      
-    //   toast.success("Token added successfully");
     } catch (err) {
       setError("Failed to add token");
-    //   toast.error("Failed to add token");
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Add chain-address pair to new token form
   const handleAddNewChainAddress = () => {
     setNewTokenData({
       ...newTokenData,
@@ -196,7 +139,6 @@ const AdminDepositAddresses = () => {
     });
   };
 
-  // Remove chain-address pair from new token form
   const handleRemoveNewChainAddress = (index: number) => {
     const updatedAddresses = [...newTokenData.addresses];
     updatedAddresses.splice(index, 1);
@@ -206,7 +148,6 @@ const AdminDepositAddresses = () => {
     });
   };
 
-  // Update field in new token form
   const handleNewTokenChange = (
     index: number, 
     field: 'chain' | 'address', 
@@ -247,7 +188,6 @@ const AdminDepositAddresses = () => {
           <p className="text-gray-600">Manage cryptocurrency deposit addresses for your platform</p>
         </header>
 
-        {/* Add new token button */}
         <div className="mb-8">
           <button 
             onClick={() => setShowAddTokenForm(!showAddTokenForm)}
@@ -257,11 +197,9 @@ const AdminDepositAddresses = () => {
           </button>
         </div>
 
-        {/* Add new token form */}
         {showAddTokenForm && (
           <div className="mb-8 bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-semibold mb-4">Add New Token</h2>
-            
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">Token Symbol</label>
               <input
@@ -286,7 +224,6 @@ const AdminDepositAddresses = () => {
                     </button>
                   )}
                 </div>
-                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-gray-700 mb-1">Chain</label>
@@ -319,7 +256,6 @@ const AdminDepositAddresses = () => {
               >
                 Add Chain-Address Pair
               </button>
-              
               <button
                 onClick={handleAddToken}
                 disabled={loading}
@@ -331,7 +267,6 @@ const AdminDepositAddresses = () => {
           </div>
         )}
 
-        {/* List of tokens and their addresses */}
         <div className="space-y-6">
           {addresses.map((depositAddress) => (
             <div 
@@ -390,7 +325,6 @@ const AdminDepositAddresses = () => {
                         </button>
                       )}
                     </div>
-                    
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-gray-700 mb-1">Chain</label>
@@ -428,19 +362,19 @@ const AdminDepositAddresses = () => {
                 
                 {editingTokenId === depositAddress._id && (
                   <button
-                  onClick={() => handleAddChainAddress(depositAddress._id)}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition mt-4"
-                >
-                  Add Chain-Address Pair
-                </button>
-              )}
+                    onClick={() => handleAddChainAddress(depositAddress._id)}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition mt-4"
+                  >
+                    Add Chain-Address Pair
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default AdminDepositAddresses;

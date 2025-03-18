@@ -45,7 +45,7 @@ const AdminUsers = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL || process.env.SERVER_RUL}/api/admin/users`,
+          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/admin/users`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -109,7 +109,7 @@ const AdminUsers = () => {
       }
 
       await axios.patch(
-        `${process.env.NEXT_PUBLIC_API_URL || process.env.SERVER_RUL}/api/admin/users/${userId}/balance`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/admin/users/${userId}/balance`,
         { balance: updatedBalance },
         {
           headers: {

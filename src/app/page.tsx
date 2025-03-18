@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import Navbar from "@/components/Navbar/Navbar";
 import Image from "next/image";
@@ -9,7 +9,7 @@ import Link from "next/link";
 import CustomButton from "@/components/CustomButton/Button";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { useRouter } from "next/navigation"; // Added missing import
+import { useRouter } from "next/navigation";
 
 const NoticeBox = ({ close }: { close: (data: boolean) => void }) => {
   return (
@@ -42,15 +42,15 @@ const NoticeBox = ({ close }: { close: (data: boolean) => void }) => {
 };
 
 const Home: React.FC = () => {
-  const router = useRouter(); // Declared router
+  const router = useRouter();
   const isLoggedIn = useSelector((state: RootState) => state.auth.user);
   const [prices, setPrices] = useState<{ [key: string]: number }>({
     USDT: 1,
     BTC: 0,
     USDC: 0,
     ETH: 0,
-  }); // Declared prices state
-  const [loadingPrices, setLoadingPrices] = useState(true); // Declared loadingPrices state
+  });
+  const [loadingPrices, setLoadingPrices] = useState(true);
 
   const services = [
     "Recharge",
@@ -73,12 +73,6 @@ const Home: React.FC = () => {
       document.body.style.overflowY = "scroll";
     }
   }, [noticeOpen]);
-
-  useEffect(() => {
-    if (isLoggedIn === null) {
-      router.push("/Login");
-    }
-  }, [router, isLoggedIn]);
 
   useEffect(() => {
     const fetchPrices = async () => {
@@ -125,17 +119,16 @@ const Home: React.FC = () => {
       <section className="mt-[10px] w-full flex justify-between items-center">
         <figure className="w-[32px] h-[32px] relative rounded-[50px]">
           <Link
-              href={"/profile"}
-              className="w-[48%] flex justify-center bg-theme_green rounded-[6px] py-[5px] text-white"
-            >
-          <Image
-            src={`/assets/images/logo.png`}
-            alt={`Logo image`}
-            fill
-            className="rounded-[inherit]"
-          />
-              {/* Register */}
-            </Link>
+            href={"/profile"}
+            className="w-[48%] flex justify-center bg-theme_green rounded-[6px] py-[5px] text-white"
+          >
+            <Image
+              src={`/assets/images/logo.png`}
+              alt={`Logo image`}
+              fill
+              className="rounded-[inherit]"
+            />
+          </Link>
         </figure>
 
         <section className="flex items-center">
@@ -216,8 +209,13 @@ const Home: React.FC = () => {
             <figure className="w-[28px] h-[28px] mb-[2px] relative">
               <Image
                 src={`/assets/icons/${each}.png`}
-                alt={`Service icon`}
+                alt={`Service icon for ${each}`}
                 fill
+                style={{ objectFit: "contain" }} // Ensure image fits within bounds
+                onError={(e) => {
+                  console.error(`Failed to load image for ${each}:`, e);
+                  (e.target as HTMLImageElement).src = "/assets/icons/default.png"; // Fallback image
+                }}
               />
             </figure>
             <span className="text-[14px] text-center w-full">

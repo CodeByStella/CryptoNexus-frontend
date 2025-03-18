@@ -65,7 +65,7 @@ const ChatPage: React.FC = () => {
 
   const closeChat = useCallback(() => {
     if (decodedId) {
-      socket.emit("closeChat", decodedEmail);
+      socket.emit("closeChat", decodedId);
       router.push("/tickets");
       localStorage.removeItem(`chatData_${decodedId}`);
     }
@@ -141,7 +141,7 @@ const ChatPage: React.FC = () => {
       socket.off("adminMessage", handleAdminMessage);
       socket.off("chatClosed", handleChatClosed);
     };
-  }, [decodedId, adminEmail, saveChatData, socket]);
+  }, [decodedId, adminEmail, saveChatData, socket, router]);
 
   useEffect(() => {
     saveChatData();

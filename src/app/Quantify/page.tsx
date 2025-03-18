@@ -157,7 +157,7 @@ const Quantify = () => {
               </section>
 
               <section className="w-full mt-[20px]">
-                <CustomButton text="Trade Now" width={100} />
+                <CustomButton text="Trade Now" width={100} type="button" />
               </section>
             </section>
           </section>

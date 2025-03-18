@@ -195,7 +195,7 @@ const Sidebar = ({
     </AnimatePresence>
   );
 };
-
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 const fetchTrades = async (setTrades: React.Dispatch<React.SetStateAction<Trade[]>>) => {
   try {
     const token = localStorage.getItem("token");
@@ -204,7 +204,7 @@ const fetchTrades = async (setTrades: React.Dispatch<React.SetStateAction<Trade[
       return;
     }
 
-    const response = await fetch("process.env.SERVER_RUL/api/user/trades", {
+    const response = await fetch(`${BASE_URL}/api/user/trades`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -230,7 +230,7 @@ const submitTrade = async (tradeData: any, setAmount: React.Dispatch<React.SetSt
       return;
     }
 
-    const response = await fetch("process.env.SERVER_RUL/api/user/trade", {
+    const response = await fetch(`${BASE_URL}/api/user/trade`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -410,9 +410,6 @@ const Spot = ({ marketPrice }: { marketPrice: number }) => {
                   <span className="text-[12px] text-gray-600 mr-2">
                     {new Date(trade.createdAt).toLocaleString()}
                   </span>
-                  <figure className="w-[16px] h-[16px] relative">
-                    {/* <Image src="/assets/icons/refresh.png" alt="Refresh icon" fill /> */}
-                  </figure>
                 </div>
                 <div className="flex items-center space-x-4">
                   <span className="text-[12px] text-gray-600">
@@ -625,12 +622,6 @@ const Swap = ({ marketPrice }: { marketPrice: number }) => {
           </section>
         </section>
         <section className="w-full flex justify-center items-center">
-          <section className="flex flex-col justify-start items-center">
-            <figure className="w-[150px] h-[150px] relative">
-              {/* <Image src="/assets/images/Nodate.svg" alt="Info image" fill /> */}
-            </figure>
-            {/* <span className="text-[#C0C4CC] font-[20px]">Empty</span> */}
-          </section>
         </section>
       </section>
       <section className="w-full mt-[10px]">
@@ -646,9 +637,6 @@ const Swap = ({ marketPrice }: { marketPrice: number }) => {
                   <span className="text-[12px] text-gray-600 mr-2">
                     {new Date(trade.createdAt).toLocaleString()}
                   </span>
-                  <figure className="w-[16px] h-[16px] relative">
-                    {/* <Image src="/assets/icons/refresh.png" alt="Refresh icon" fill /> */}
-                  </figure>
                 </div>
                 <div className="flex items-center space-x-4">
                   <span className="text-[12px] text-gray-600">
@@ -815,12 +803,6 @@ const Seconds = ({ marketPrice }: { marketPrice: number }) => {
           </section>
         </section>
         <section className="w-full flex justify-center items-center">
-          <section className="flex flex-col justify-start items-center">
-            <figure className="w-[150px] h-[150px] relative">
-              {/* <Image src="/assets/images/Nodate.svg" alt="Info image" fill /> */}
-            </figure>
-            {/* <span className="text-[#C0C4CC] font-[20px]">Empty</span> */}
-          </section>
         </section>
       </section>
       <section className="w-full mt-[10px]">
@@ -836,9 +818,6 @@ const Seconds = ({ marketPrice }: { marketPrice: number }) => {
                   <span className="text-[12px] text-gray-600 mr-2">
                     {new Date(trade.createdAt).toLocaleString()}
                   </span>
-                  <figure className="w-[16px] h-[16px] relative">
-                    {/* <Image src="/assets/icons/refresh.png" alt="Refresh icon" fill /> */}
-                  </figure>
                 </div>
                 <div className="flex items-center space-x-4">
                   <span className="text-[12px] text-gray-600">

@@ -1,5 +1,12 @@
 import axios from 'axios';
-import { PriceDataItem } from "@/types/types";
+
+interface PriceDataItem {
+  icon: any;
+  ticker: any;
+  value: number;
+  changeDirection: "High" | "Low";
+  changeRate: number;
+}
 
 type TickerCallback = (data: {
   c: number;
@@ -98,10 +105,10 @@ class MarketDataService {
       const result = this.dataCache[endpoint].map(data => ({
         icon: data.icon || `/icons/${data.scode?.toLowerCase().replace(/\s/g, '')}.png`,
         ticker: (endpoint === 'gold' || endpoint === 'futures') ? data.scode : data.m,
-        value: Number(parseFloat(data.c).toFixed(4)), // Apply toFixed(4) here
+        value: Number(parseFloat(data.c).toFixed(4)),
         changeDirection: parseFloat(data.ch) >= 0 ? "High" : "Low",
-        changeRate: Number(Math.abs(parseFloat(data.ch)).toFixed(4)), // Apply toFixed(4) here
-      }));
+        changeRate: Number(Math.abs(parseFloat(data.ch)).toFixed(4)),
+      })) as PriceDataItem[];
       callback(result);
       return;
     }
@@ -114,10 +121,10 @@ class MarketDataService {
           const result = response.data.result.map((data: any) => ({
             icon: data.icon || `/icons/${data.scode?.toLowerCase().replace(/\s/g, '')}.png`,
             ticker: (endpoint === 'gold' || endpoint === 'futures') ? data.scode : data.m,
-            value: Number(parseFloat(data.c).toFixed(4)), // Apply toFixed(4) here
+            value: Number(parseFloat(data.c).toFixed(4)),
             changeDirection: parseFloat(data.ch) >= 0 ? "High" : "Low",
-            changeRate: Number(Math.abs(parseFloat(data.ch)).toFixed(4)), // Apply toFixed(4) here
-          }));
+            changeRate: Number(Math.abs(parseFloat(data.ch)).toFixed(4)),
+          })) as PriceDataItem[];
           
           callback(result);
         } else {

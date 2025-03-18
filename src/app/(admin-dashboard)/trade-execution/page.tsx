@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
 // Updated Trade type to match backend
@@ -33,35 +33,38 @@ const Admin = () => {
   };
 
   const token = getAuthToken();
+  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
   // Fetch trades on component mount
-  const fetchTrades = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await axios.get("process.env.SERVER_RUL/api/admin/trades", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = response.data;
-      if (Array.isArray(data.trades)) { // Backend sends trades in a "trades" array
-        setTrades(data.trades);
-      } else {
-        setError("Invalid trade data format.");
+  const fetchTrades = useCallback(() => {
+    async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await axios.get(`${BASE_URL}/api/admin/trades`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = response.data;
+        if (Array.isArray(data.trades)) { // Backend sends trades in a "trades" array
+          setTrades(data.trades);
+        } else {
+          setError("Invalid trade data format.");
+        }
+      } catch (error: any) {
+        setError("Error fetching trades: " + error.message);
+      } finally {
+        setLoading(false);
       }
-    } catch (error: any) {
-      setError("Error fetching trades: " + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+  }, [BASE_URL, token])
 
   // Handle accepting or rejecting a trade
   const handleTradeAction = async (tradeId: string, action: "accept" | "reject") => {
     try {
       const newStatus = action === "accept" ? "approved" : "rejected";
-      const response = await fetch(`process.env.SERVER_RUL/api/admin/trades/${tradeId}/process`, {
+      const response = await fetch(`${BASE_URL}/api/admin/trades/${tradeId}/process`, {
         method: "PUT", // Backend uses PUT
         headers: {
           "Content-Type": "application/json",
@@ -82,7 +85,7 @@ const Admin = () => {
 
   useEffect(() => {
     fetchTrades();
-  }, []);
+  }, [fetchTrades]);
 
   return (
     <div className="font-[Inter] w-full flex flex-col justify-start items-center">

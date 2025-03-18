@@ -5,7 +5,7 @@ class SocketService {
   private static instance: SocketService;
 
   private constructor() {
-    this.socket = io(process.env.SERVER_RUL, { autoConnect: false });
+    this.socket = io("http://localhost:5000", { autoConnect: false });
   }
 
   public static getInstance(): SocketService {

@@ -14,11 +14,12 @@ const TicketsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
   useEffect(() => {
     const fetchTickets = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("process.env.SERVER_RUL/api/admin/conversations", {
+        const response = await fetch(`${BASE_URL}/api/admin/conversations`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -34,7 +35,7 @@ const TicketsPage: React.FC = () => {
     };
 
     fetchTickets();
-  }, []);
+  }, [BASE_URL]);
 
   if (loading) return <div className="min-h-screen bg-gray-100 flex items-center justify-center">Loading...</div>;
   if (error) return <div className="min-h-screen bg-gray-100 flex items-center justify-center text-red-500">{error}</div>;

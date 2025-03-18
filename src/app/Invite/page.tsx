@@ -97,7 +97,7 @@ const Invite = () => {
             </section>
 
             <section className="w-full my-[28px]" onClick={openModal}>
-              <CustomButton text="Promote now" width={100} />
+              <CustomButton text="Promote now" width={100} type="button" />
             </section>
 
             {/* Tab section  */}

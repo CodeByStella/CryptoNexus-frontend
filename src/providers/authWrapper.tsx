@@ -17,16 +17,16 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const getUserProfile = async () => {
       const token = localStorage.getItem("token");
-      if (!token) {
-        dispatch(logout());
-        router.push("/Login");
-        setLoading(false);
-        return;
-      }
+      // if (!token) {
+      //   dispatch(logout());
+      //   router.push("/Login");
+      //   setLoading(false);
+      //   return;
+      // }
 
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL || process.env.SERVER_RUL}/api/auth/profile`,
+          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/auth/profile`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -40,7 +40,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
         console.error("Failed to fetch user profile:", error);
         dispatch(logout());
         localStorage.removeItem("token");
-        router.push("/Login");
+        // router.push("/Login");
       } finally {
         setLoading(false);
       }
