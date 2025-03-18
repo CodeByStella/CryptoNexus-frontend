@@ -39,7 +39,7 @@ const Admin = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get("http://localhost:5000/api/admin/trades", {
+      const response = await axios.get("process.env.SERVER_RUL/api/admin/trades", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -61,7 +61,7 @@ const Admin = () => {
   const handleTradeAction = async (tradeId: string, action: "accept" | "reject") => {
     try {
       const newStatus = action === "accept" ? "approved" : "rejected";
-      const response = await fetch(`http://localhost:5000/api/admin/trades/${tradeId}/process`, {
+      const response = await fetch(`process.env.SERVER_RUL/api/admin/trades/${tradeId}/process`, {
         method: "PUT", // Backend uses PUT
         headers: {
           "Content-Type": "application/json",

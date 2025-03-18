@@ -18,7 +18,7 @@ const TicketsPage: React.FC = () => {
     const fetchTickets = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("http://localhost:5000/api/admin/conversations", {
+        const response = await fetch("process.env.SERVER_RUL/api/admin/conversations", {
           headers: {
             Authorization: `Bearer ${token}`,
           },

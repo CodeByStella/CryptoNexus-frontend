@@ -222,7 +222,7 @@ const Recharge = () => {
 
     try {
       // Send the deposit details to the server
-      const response = await fetch("http://localhost:5000/api/deposits", {
+      const response = await fetch("process.env.SERVER_RUL/api/deposits", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token") || ""}`,

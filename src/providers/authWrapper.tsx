@@ -26,7 +26,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
 
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/auth/profile`,
+          `${process.env.NEXT_PUBLIC_API_URL || process.env.SERVER_RUL}/api/auth/profile`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

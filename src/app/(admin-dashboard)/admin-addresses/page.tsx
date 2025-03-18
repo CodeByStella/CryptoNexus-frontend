@@ -20,7 +20,7 @@ interface DepositAddress {
 
 // Mock API functions for managing addresses
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = process.env.SERVER_RUL;
 
 const fetchAddresses = async () => {
   const response = await axios.get(`${BASE_URL}/api/admin/deposit-addresses`, {

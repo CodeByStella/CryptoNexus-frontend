@@ -204,7 +204,7 @@ const fetchTrades = async (setTrades: React.Dispatch<React.SetStateAction<Trade[
       return;
     }
 
-    const response = await fetch("http://localhost:5000/api/user/trades", {
+    const response = await fetch("process.env.SERVER_RUL/api/user/trades", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -230,7 +230,7 @@ const submitTrade = async (tradeData: any, setAmount: React.Dispatch<React.SetSt
       return;
     }
 
-    const response = await fetch("http://localhost:5000/api/user/trade", {
+    const response = await fetch("process.env.SERVER_RUL/api/user/trade", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
