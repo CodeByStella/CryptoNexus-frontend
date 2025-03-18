@@ -49,7 +49,7 @@ const addToken = async (data: { token: string; addresses: AddressData[] }) => {
   return response.data;
 };
 
-export { fetchAddresses, updateAddress, addToken };
+// export { fetchAddresses, updateAddress, addToken };
 
 
 const AdminDepositAddresses = () => {
