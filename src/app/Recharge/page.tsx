@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { fetchDepositAddresses } from "@/services/api";
 import { QRCodeSVG } from "qrcode.react";
-import SuccessModal from "./successModal"; 
+import SuccessModal from "./successModal";
 
 type DropUpCurrencySelectorProps = {
   currencies: string[];
@@ -94,12 +94,10 @@ const DropUpCurrencySelector: React.FC<DropUpCurrencySelectorProps> = ({
     const lastChild = list.children[list.children.length - 1] as HTMLElement;
 
     if (firstChild && lastChild) {
-      list.style.paddingTop = `${
-        list.offsetHeight / 2 - firstChild.offsetHeight / 2
-      }px`;
-      list.style.paddingBottom = `${
-        list.offsetHeight / 2 - lastChild.offsetHeight / 2
-      }px`;
+      list.style.paddingTop = `${list.offsetHeight / 2 - firstChild.offsetHeight / 2
+        }px`;
+      list.style.paddingBottom = `${list.offsetHeight / 2 - lastChild.offsetHeight / 2
+        }px`;
     }
   }, [currencies]);
 
@@ -142,11 +140,10 @@ const DropUpCurrencySelector: React.FC<DropUpCurrencySelectorProps> = ({
               {currencies.map((currency, i) => (
                 <div
                   key={i}
-                  className={`w-full text-center py-3 text-lg transition-all duration-200 ${
-                    i === selectedIndex
+                  className={`w-full text-center py-3 text-lg transition-all duration-200 ${i === selectedIndex
                       ? "font-bold text-black"
                       : "font-light text-gray-500"
-                  }`}
+                    }`}
                 >
                   {currency}
                 </div>
@@ -159,7 +156,7 @@ const DropUpCurrencySelector: React.FC<DropUpCurrencySelectorProps> = ({
   );
 };
 
-export function MyQRCode({ value }: { value: string }) {
+function MyQRCode({ value }: { value: string; }) {
   return <QRCodeSVG value={value} size={150} />;
 }
 
