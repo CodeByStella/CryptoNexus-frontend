@@ -671,19 +671,39 @@ const Seconds = ({ marketPrice }: { marketPrice: number }) => {
   const [dropUpOpen, setDropupOpen] = useState<Boolean>(false);
   const [trades, setTrades] = useState<Trade[]>([]);
   const [amount, setAmount] = useState<number>(0);
-  const openDropup = () => setDropupOpen(true);
-  const closeDropUp = () => setDropupOpen(false);
-  const dropUpData: string[] = ["10s Up", "20s Up", "30s Up", "40s Up", "50s Up", "60s Up", "10s Down", "20s Down", "30s Down", "40s Down", "50s Down", "60s Down"];
-  const [selectedOption, setSelectedOption] = useState<string>(dropUpData[0]);
   const [bottomTab, setBottomTab] = useState<string>("Position");
+
+  // Delivery time options and corresponding profits
+  const deliveryOptions = [
+    { time: "30s", profit: 6 },
+    { time: "60s", profit: 9 },
+    { time: "90s", profit: 13 },
+    { time: "120s", profit: 16 },
+    { time: "180s", profit: 21 },
+    { time: "300s", profit: 28 },
+    { time: "30s", profit: 6 },
+    { time: "60s", profit: 9 },
+  ];
+
+  // Dropdown data (just the time values)
+  const dropUpData: string[] = deliveryOptions.map((option) => option.time);
+  const [selectedOption, setSelectedOption] = useState<string>(dropUpData[0]);
 
   useEffect(() => {
     fetchTrades(setTrades);
   }, []);
 
-  const handleSubmit = () => {
+  const openDropup = () => setDropupOpen(true);
+  const closeDropUp = () => setDropupOpen(false);
+
+  // Get the profit percentage based on the selected time
+  const selectedProfit = deliveryOptions.find(
+    (option) => option.time === selectedOption
+  )?.profit || 6; // Default to 6% if not found
+
+  const handleSubmit = (tradeType: "buy" | "sell") => {
     const newTrade = {
-      tradeType: selectedOption.includes("Up") ? "buy" : "sell",
+      tradeType,
       fromCurrency: "USDT",
       toCurrency: "USDT",
       amount: amount || 0,
@@ -693,7 +713,7 @@ const Seconds = ({ marketPrice }: { marketPrice: number }) => {
   };
 
   return (
-    <section className="w-full flex flex-col justify-start items-center relative">
+    <section className="w-full flex flex-col justify-start items-center relative pb-[100px]"> {/* Added padding-bottom */}
       <DropUp
         closeDropUp={closeDropUp}
         data={dropUpData}
@@ -719,18 +739,26 @@ const Seconds = ({ marketPrice }: { marketPrice: number }) => {
                 <figure className="relative w-[20px] h-[20px] mr-[8px]">
                   <Image src="/assets/images/Up.svg" alt="Up image" fill />
                 </figure>
-                <span className="text-theme_green text-[12px]">Up ≥ 0.25%</span>
+                <span className="text-theme_green text-[12px]">
+                  Up ≥ 0.25%
+                </span>
               </section>
-              <span className="text-[silver] text-[12px] font-light">(*6%)</span>
+              <span className="text-[silver] text-[12px] font-light">
+                (*{selectedProfit}%)
+              </span>
             </section>
             <section className="my-[7px] w-full rounded-[5px] p-[7px] flex justify-between items-center bg-[#F5F7FA]">
               <section className="flex justify-start items-center">
                 <figure className="relative w-[20px] h-[20px] mr-[8px]">
-                  <Image src="/assets/images/Down.svg" alt="Up image" fill />
+                  <Image src="/assets/images/Down.svg" alt="Down image" fill />
                 </figure>
-                <span className="text-theme_red text-[12px]">Down ≥ 0.15%</span>
+                <span className="text-theme_red text-[12px]">
+                  Down ≥ 0.15%
+                </span>
               </section>
-              <span className="text-[silver] text-[12px] font-light">(*6%)</span>
+              <span className="text-[silver] text-[12px] font-light">
+                (*{selectedProfit}%)
+              </span>
             </section>
             <span className="text-[11px] mb-[7px]">
               Limit: <span className="font-light text-theme_green">500-99999999</span>
@@ -756,7 +784,7 @@ const Seconds = ({ marketPrice }: { marketPrice: number }) => {
           </div>
           <button
             className="cursor-pointer w-full h-[45px] text-white rounded-[3px] mt-[7px] bg-theme_green flex items-center justify-end"
-            onClick={handleSubmit}
+            onClick={() => handleSubmit("buy")}
           >
             <section className="w-[60%] flex justify-between items-center">
               <span>Long</span>
@@ -765,7 +793,7 @@ const Seconds = ({ marketPrice }: { marketPrice: number }) => {
           </button>
           <button
             className="cursor-pointer w-full h-[45px] text-white rounded-[3px] mt-[10px] bg-theme_red flex items-center justify-end"
-            onClick={handleSubmit}
+            onClick={() => handleSubmit("sell")}
           >
             <section className="w-[60%] flex justify-between items-center">
               <span>Short</span>
@@ -802,8 +830,7 @@ const Seconds = ({ marketPrice }: { marketPrice: number }) => {
             ))}
           </section>
         </section>
-        <section className="w-full flex justify-center items-center">
-        </section>
+        <section className="w-full flex justify-center items-center"></section>
       </section>
       <section className="w-full mt-[10px]">
         <h3 className="text-[16px] font-medium mb-[10px]">Pending Trades</h3>
@@ -821,7 +848,9 @@ const Seconds = ({ marketPrice }: { marketPrice: number }) => {
                 </div>
                 <div className="flex items-center space-x-4">
                   <span className="text-[12px] text-gray-600">
-                    {trade.tradeType === "buy" ? `${trade.amount.toFixed(4)} ${trade.fromCurrency}` : `${trade.amount.toFixed(4)} ${trade.fromCurrency}`}
+                    {trade.tradeType === "buy"
+                      ? `${trade.amount.toFixed(4)} ${trade.fromCurrency}`
+                      : `${trade.amount.toFixed(4)} ${trade.fromCurrency}`}
                   </span>
                   <span
                     className={`text-[12px] font-medium ${
@@ -831,7 +860,9 @@ const Seconds = ({ marketPrice }: { marketPrice: number }) => {
                     {trade.tradeType.charAt(0).toUpperCase() + trade.tradeType.slice(1)}
                   </span>
                   <span className="text-[12px] text-gray-600">
-                    {trade.tradeType === "sell" ? `${(trade.amount * trade.expectedPrice).toFixed(4)} ${trade.toCurrency}` : `${trade.amount.toFixed(4)} ${trade.toCurrency}`}
+                    {trade.tradeType === "sell"
+                      ? `${(trade.amount * trade.expectedPrice).toFixed(4)} ${trade.toCurrency}`
+                      : `${trade.amount.toFixed(4)} ${trade.toCurrency}`}
                   </span>
                 </div>
                 <span className="text-[12px] text-teal-500">

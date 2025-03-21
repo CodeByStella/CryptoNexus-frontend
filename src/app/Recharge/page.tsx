@@ -1,4 +1,3 @@
-// src/app/Recharge/page.tsx
 "use client";
 
 import Image from "next/image";
@@ -51,6 +50,7 @@ const Recharge = () => {
   const [preview, setPreview] = useState<string | null>(null);
 
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
+  const [copySuccess, setCopySuccess] = useState<boolean>(false); // Added for copy feedback
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -110,6 +110,17 @@ const Recharge = () => {
   const handleCheckOrder = () => {
     setShowSuccessModal(false);
     window.location.href = "/";
+  };
+
+  const handleCopyAddress = async () => {
+    try {
+      await navigator.clipboard.writeText(selectedAddress);
+      setCopySuccess(true); // Show feedback
+      setTimeout(() => setCopySuccess(false), 2000); // Reset after 2 seconds
+    } catch (err) {
+      console.error("Failed to copy address:", err);
+      alert("Failed to copy address. Please try manually selecting and copying.");
+    }
   };
 
   const currencies = [
@@ -266,11 +277,13 @@ const Recharge = () => {
 
             <button
               type="button"
-              onClick={() => navigator.clipboard.writeText(selectedAddress)}
-              className="flex items-center bg-theme_green text-white rounded px-4 py-2"
+              onClick={handleCopyAddress}
+              className={`flex items-center text-white rounded px-4 py-2 transition-colors duration-300 ${
+                copySuccess ? "bg-green-700" : "bg-theme_green"
+              }`}
             >
               <Image src="/assets/images/Copy.png" alt="Copy" width={20} height={20} className="mr-2" />
-              <span>Copy</span>
+              <span>{copySuccess ? "Copied!" : "Copy"}</span>
             </button>
 
             <section className="w-full flex flex-col my-5">
