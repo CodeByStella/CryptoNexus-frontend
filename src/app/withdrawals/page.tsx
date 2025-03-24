@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import { RootState } from "@/store"; // Import RootState from @store
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 const CryptoWithdrawalInterface = () => {
   const router = useRouter();

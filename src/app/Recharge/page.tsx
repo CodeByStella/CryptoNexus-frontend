@@ -72,7 +72,7 @@ const Recharge = () => {
       return;
     }
 
-    const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+    const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
     const formData = new FormData();
     formData.append("amount", amount);
     formData.append("token", selectedToken);

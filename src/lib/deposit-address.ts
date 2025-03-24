@@ -15,7 +15,7 @@ interface DepositAddress {
   updatedAt: string;
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 export const fetchAddresses = async () => {
   const response = await axios.get(`${BASE_URL}/api/admin/deposit-addresses`, {

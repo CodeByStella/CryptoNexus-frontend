@@ -36,7 +36,7 @@ class MarketDataService {
   }
 
   private connectSocket() {
-    this.socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000', {
+    this.socket = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000', {
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 2000,

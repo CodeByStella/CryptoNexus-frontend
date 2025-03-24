@@ -14,7 +14,7 @@ const TicketsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
   useEffect(() => {
     const fetchTickets = async () => {
       try {

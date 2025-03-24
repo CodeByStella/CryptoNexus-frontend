@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Trade } from "@/types";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 export const useTrades = () => {
   const [trades, setTrades] = useState<Trade[]>([]);
