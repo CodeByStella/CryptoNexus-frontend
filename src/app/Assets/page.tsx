@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import Link from "next/link";
 
 const Assets = () => {
   const router = useRouter();
@@ -132,13 +133,15 @@ const Assets = () => {
                     className={`w-[32%] text-[13px] flex flex-col items-center`}
                   >
                     <figure className="mb-[8px] w-[22px] h-[22px] relative">
-                      <Image
-                        src={`/assets/icons/${
-                          e === "Recharge" ? "Recharge-crypto" : e
-                        }.png`}
-                        alt="Asset icon"
-                        fill
-                      />
+                      <Link href={`/${e === "Withdrawals" ? e.toLowerCase() : e} `} >
+                        <Image
+                          src={`/assets/icons/${
+                            e === "Recharge" ? "Recharge-crypto" : e
+                          }.png`}
+                          alt="Asset icon"
+                          fill
+                        />
+                      </Link>
                     </figure>
                     <span>{e}</span>
                   </section>

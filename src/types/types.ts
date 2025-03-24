@@ -8,6 +8,7 @@ export type featuredTokenType = {
 
 type ChangeDirection = "High" | "Low";
 
+
 export type CryptoPrice = {
     ticker: string;
     value: number; // 4 decimal places

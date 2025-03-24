@@ -2,14 +2,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { login, logout } from "@/store/slices/authSlice";
 import axios from "axios";
 
+// Add public routes that don't require authentication
+const PUBLIC_ROUTES = ['/Login', '/Register', '/About'];
+
 const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
+  const pathname = usePathname();
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state: RootState) => state.auth.user);
   const [loading, setLoading] = useState(true);
@@ -17,12 +21,17 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const getUserProfile = async () => {
       const token = localStorage.getItem("token");
-      // if (!token) {
-      //   dispatch(logout());
-      //   router.push("/Login");
-      //   setLoading(false);
-      //   return;
-      // }
+      const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
+      
+      if (!token) {
+        dispatch(logout());
+        // Only redirect to login if not on a public route
+        if (!isPublicRoute) {
+          router.push("/Login");
+        }
+        setLoading(false);
+        return;
+      }
 
       try {
         const response = await axios.get(
@@ -40,14 +49,17 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
         console.error("Failed to fetch user profile:", error);
         dispatch(logout());
         localStorage.removeItem("token");
-        // router.push("/Login");
+        // Only redirect to login if not on a public route
+        if (!isPublicRoute) {
+          router.push("/Login");
+        }
       } finally {
         setLoading(false);
       }
     };
 
     getUserProfile();
-  }, [dispatch, router]);
+  }, [dispatch, router, pathname]);
 
   if (loading) {
     return <div>Loading...</div>;

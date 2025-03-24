@@ -21,6 +21,16 @@ export default function Sidebar() {
           </Link>
         </li>
         <li>
+          <Link href="/admin-withdrawals" className="block py-2 px-4 hover:bg-gray-700 rounded-lg">
+            Withdrawals
+          </Link>
+        </li>
+        <li>
+          <Link href="/admin-seconds" className="block py-2 px-4 hover:bg-gray-700 rounded-lg">
+            Seconds
+          </Link>
+        </li>
+        <li>
           <Link href="/admin-addresses" className="block py-2 px-4 hover:bg-gray-700 rounded-lg">
             Addresses
           </Link>

@@ -29,7 +29,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         <meta property="og:type" content="website" />
         <meta property="og:locale" content="en_US" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="CryptoNexus" />
+        <meta name="twitter:title" content="ACTISEXA" />
         <meta
           name="twitter:description"
           content="REST ASSURED we provide the most professional technical support, and your funds are very safe."

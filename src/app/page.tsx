@@ -28,13 +28,13 @@ const NoticeBox = ({ close }: { close: (data: boolean) => void }) => {
         </section>
         <p className="font-bold text-center mb-[9px] mt-[-7px]">Notice</p>
         <span className="break-words mb-[20px] text-[12px] text-center">
-          Dear customer, welcome to CryptoNexus! Our company in order to give back
+          Dear customer, welcome to Actisex! Our company in order to give back
           to new and old users, the platform launched a limited time to enjoy
           the USDT position building incentive activities, quota is limited if
           you need to participate in a timely manner to contact online customer
           service to build a position booking, the quota to take a first-come,
           first-served approach. The final right of interpretation of the
-          activity belongs to the CryptoNexus Operations Department.
+          activity belongs to the Actisex Operations Department.
         </span>
       </section>
     </section>

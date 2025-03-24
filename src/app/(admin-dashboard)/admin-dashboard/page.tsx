@@ -144,7 +144,7 @@ const AdminUsers = () => {
   }
 
   return (
-    <main className="font-[Inter] w-full min-h-screen flex flex-col justify-start items-center px-[20px] bg-[#ECFBFE]">
+    <main className="font-[Inter] w-full min-h-screen flex flex-col justify-start items-center px-[20px] bg-white">
       <Navbar />
       <h1 className="text-2xl font-bold my-6">Manage Users</h1>
       <section className="w-full max-w-4xl mb-4">

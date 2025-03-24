@@ -4,7 +4,7 @@ import axios from "axios";
 
 // Updated Trade type to match backend
 export type Trade = {
-  id: string; 
+  id: string;
   tradeType: "buy" | "sell";
   fromCurrency: string;
   toCurrency: string;
@@ -36,29 +36,27 @@ const Admin = () => {
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
   // Fetch trades on component mount
-  const fetchTrades = useCallback(() => {
-    async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await axios.get(`${BASE_URL}/api/admin/trades`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = response.data;
-        if (Array.isArray(data.trades)) { // Backend sends trades in a "trades" array
-          setTrades(data.trades);
-        } else {
-          setError("Invalid trade data format.");
-        }
-      } catch (error: any) {
-        setError("Error fetching trades: " + error.message);
-      } finally {
-        setLoading(false);
+  const fetchTrades = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get(`${BASE_URL}/api/admin/trades`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = response.data;
+      if (Array.isArray(data.trades)) { // Backend sends trades in a "trades" array
+        setTrades(data.trades);
+      } else {
+        setError("Invalid trade data format.");
       }
-    };
-  }, [BASE_URL, token])
+    } catch (error: any) {
+      setError("Error fetching trades: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [BASE_URL, token]);
 
   // Handle accepting or rejecting a trade
   const handleTradeAction = async (tradeId: string, action: "accept" | "reject") => {
@@ -74,7 +72,7 @@ const Admin = () => {
       });
 
       if (response.ok) {
-        await fetchTrades();
+        await fetchTrades(); // Call the async function directly
       } else {
         setError("Failed to update trade: " + response.statusText);
       }
@@ -84,7 +82,7 @@ const Admin = () => {
   };
 
   useEffect(() => {
-    fetchTrades();
+    fetchTrades(); // Call the async function directly
   }, [fetchTrades]);
 
   return (

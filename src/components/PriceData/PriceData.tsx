@@ -1,7 +1,4 @@
-import {
-  PriceDataItem,
-  featuredTokenType,
-} from "@/types/types";
+import { PriceDataItem } from "@/types/types";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import marketDataService from "@/services/binanceSocket";
@@ -13,40 +10,37 @@ type PriceListProps = {
 const PriceList = ({ data }: PriceListProps) => {
   return (
     <section className="w-full flex flex-col justify-start items-center">
-      {data.map((each, i) => {
-        return (
-          <section
-            key={i}
-            className="w-full flex justify-between items-center py-[10px] price-list"
-          >
-            <section className="w-[50%] flex justify-start items-center">
-              <figure className="w-[28px] h-[28px] mr-[8px] relative rounded-[50px]">
-                <Image
-                  src={each.icon}
-                  alt={`Icon for ${each.ticker}`}
-                  fill
-                  className="rounded-[inherit]"
-                />
-              </figure>
-              <span>{each.ticker}</span>
-            </section>
-            <section className="w-[24%] flex justify-end">
-              {each.value.toFixed(4)}
-            </section>
-            <section className="w-[20%] flex justify-end">
-              <div
-                className={`rounded-[8px] flex justify-center text-white py-[7px] w-[150px] ${
-                  each.changeDirection === "High" ? "bg-green-700" : "bg-red-700"
-                }`}
-              >
-                {each.changeDirection === "High" ? "+" : "-"}
-                {each.changeRate}
-                {"%"}
-              </div>
-            </section>
+      {data.map((each, i) => (
+        <section
+          key={i}
+          className="w-full flex justify-between items-center py-[10px] price-list"
+        >
+          <section className="w-[50%] flex justify-start items-center">
+            <figure className="w-[28px] h-[28px] mr-[8px] relative rounded-[50px]">
+              <Image
+                src={each.icon}
+                alt={`Icon for ${each.ticker}`}
+                fill
+                className="rounded-[inherit]"
+              />
+            </figure>
+            <span>{each.ticker}</span>
           </section>
-        );
-      })}
+          <section className="w-[24%] flex justify-end">
+            {each.value.toFixed(4)}
+          </section>
+          <section className="w-[20%] flex justify-end">
+            <div
+              className={`rounded-[8px] flex justify-center text-white py-[7px] w-[150px] ${
+                each.changeDirection === "High" ? "bg-green-700" : "bg-red-700"
+              }`}
+            >
+              {each.changeDirection === "High" ? "+" : "-"}
+              {each.changeRate}%
+            </div>
+          </section>
+        </section>
+      ))}
     </section>
   );
 };
@@ -63,7 +57,7 @@ const PriceData = ({ marketPage = false }: PriceDataProps) => {
   const categories: CategoryType[] = [
     "Precious metals",
     "Digital currency",
-    "Forex", 
+    "Forex",
     "Index",
     "Futures",
   ];
@@ -74,17 +68,49 @@ const PriceData = ({ marketPage = false }: PriceDataProps) => {
     setIsLoading(true);
     setDataToRender([]);
 
-    const fetchData = () => {
-      marketDataService.fetchMarketData(currentCategory, (updatedData) => {
-        setDataToRender(updatedData);
-        setIsLoading(false);
-      });
+    // Map category to endpoint (same as original fetchMarketData logic)
+    const categoryToEndpoint: Record<CategoryType, string> = {
+      "Digital currency": "crypto",
+      "Precious metals": "gold",
+      "Forex": "forex",
+      "Index": "index",
+      "Futures": "futures",
     };
 
-    fetchData(); 
-    const intervalId = setInterval(fetchData, 5000); 
+    const handleTickerUpdate = (data: any) => {
+      // Filter by category
+      if (data.category === categoryToEndpoint[currentCategory]) {
+        const formattedData: PriceDataItem = {
+          icon: data.icon || `/icons/${data.scode?.toLowerCase().replace(/\s/g, '')}.png`,
+          ticker: (data.category === "gold" || data.category === "futures") ? data.scode : data.m,
+          value: Number(parseFloat(data.c).toFixed(4)),
+          changeDirection: parseFloat(data.ch) >= 0 ? "High" : "Low",
+          changeRate: Number(Math.abs(parseFloat(data.ch)).toFixed(4)),
+        };
 
-    return () => clearInterval(intervalId); 
+        setDataToRender((prev) => {
+          const index = prev.findIndex((item) => item.ticker === formattedData.ticker);
+          if (index !== -1) {
+            const newData = [...prev];
+            newData[index] = formattedData;
+            return newData;
+          }
+          return [...prev, formattedData];
+        });
+
+        // Once we get the first update, stop loading
+        setIsLoading(false);
+      }
+    };
+
+    marketDataService.subscribe(handleTickerUpdate);
+    marketDataService.startFetching();
+
+    return () => {
+      marketDataService.unsubscribe(handleTickerUpdate);
+      // Optionally stop fetching if no other components need it
+      // marketDataService.stopFetching();
+    };
   }, [currentCategory]);
 
   return (

@@ -157,7 +157,7 @@ const Invite = () => {
 
             <section className="mt-[8px] w-full rounded-[7px] flex justify-between items-center h-[40px] pl-[16px] bg-[#F5F7FB]">
               <span className="w-[80%] overflow-hidden text-[14px]">
-                https://cryptosnexus.com/#/p
+                https://actisexa.xyz/#/p
               </span>
               <button className="flex items-center text-white bg-theme_green rounded-[5px] h-full px-[8px]">
                 <figure className="w-[15px] h-[15px] relative mr-[5px]">
