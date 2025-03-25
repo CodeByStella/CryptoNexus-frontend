@@ -89,7 +89,7 @@ const CryptoWithdrawalInterface = () => {
   const arrival = amount - fee;
 
   // List of tokens for the dropdown
-  const tokens = ["USDT", "BTC", "ETH", "USDC", "BNB", "XRP", "SOL"];
+  const tokens = ["USDT", "BTC", "ETH", "USDC"];
 
   // Form submission handler
   const handleSubmit = async (e: React.FormEvent) => {
