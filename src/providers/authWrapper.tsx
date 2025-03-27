@@ -9,7 +9,7 @@ import { login, logout } from "@/store/slices/authSlice";
 import axios from "axios";
 
 // Add public routes that don't require authentication
-const PUBLIC_ROUTES = ['/Login', '/Register', '/About'];
+const PUBLIC_ROUTES = ['/Login', '/Register', '/Online', '/', 'Markets'];
 
 const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();

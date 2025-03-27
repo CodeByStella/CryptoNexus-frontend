@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect, useMemo } from "react";
 import Navbar from "@/components/Navbar/Navbar";
 import { useMarketData } from "@/hooks/useMarketData";
 import { PageHeader } from "@/components/Contracts/PageHeader";
@@ -11,23 +11,25 @@ import { Swap } from "@/components/Contracts/Swap";
 import { Seconds } from "@/components/Contracts/Seconds";
 
 const Contracts = () => {
-  const tabs = ["Spot", "Swap", "Seconds"];
-  const [currentTab, setCurrentTab] = useState<"Spot" | "Swap" | "Seconds" | string>("Spot");
+  const tabs = useMemo(() => ["Spot", "Swap", "Seconds"], []);
+  const [currentTab, setCurrentTab] = useState("Spot");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { marketTickers, currentTicker, setCurrentTicker } = useMarketData();
 
   const openSidebar = useCallback(() => setSidebarOpen(true), []);
   const closeSidebar = useCallback(() => setSidebarOpen(false), []);
 
-  const changePercentage = currentTicker?.ch;
-  const marketPrice = currentTicker?.c || 0;
-  const coin = currentTicker?.m || "BTC"; // Pass the coin symbol
+  const changePercentage = useMemo(() => currentTicker?.ch || 0, [currentTicker?.ch]);
+  const marketPrice = useMemo(() => currentTicker?.c || 0, [currentTicker?.c]);
+  const coin = useMemo(() => currentTicker?.m || "BTC", [currentTicker?.m]);
+
+  const isMarketDataLoaded = marketPrice > 0;
 
   return (
     <main className="font-[Inter] w-full min-h-screen flex flex-col justify-start items-center bg-white relative px-[15px] pb-[70px] pt-[12px]">
       <PageHeader
         currentTab={currentTab}
-        setCurrentTab={setCurrentTab}
+        setCurrentTab={(tab) => setCurrentTab((prev) => (prev !== tab ? tab : prev))}
         tabs={tabs}
       />
       <Sidebar
@@ -45,16 +47,11 @@ const Contracts = () => {
           <figure className="w-[20px] h-[20px] relative mr-[10px]">
             <Image src="/assets/icons/Sidebar-menu.png" alt="Menu icon" fill />
           </figure>
-          <span>{coin}</span> {/* Display the selected coin */}
+          <span>{coin}</span>
           <p
-            className={`${
-              changePercentage !== undefined && changePercentage > 0
-                ? "text-theme_green"
-                : "text-theme_red"
-            } ml-[8px]`}
+            className={`ml-[8px] ${changePercentage > 0 ? "text-theme_green" : "text-theme_red"}`}
           >
-            {changePercentage !== undefined && changePercentage > 0 ? "+" : "-"}
-            {changePercentage !== undefined ? Math.abs(changePercentage * 100).toFixed(2) : "0.00"}%
+            {changePercentage > 0 ? "+" : "-"}{Math.abs(changePercentage * 100).toFixed(2)}%
           </p>
         </section>
         <Link href={`/Contracts/${coin}USDT`}>
@@ -63,9 +60,10 @@ const Contracts = () => {
           </figure>
         </Link>
       </section>
-      {currentTab === "Spot" && <Spot marketPrice={marketPrice} coin={coin} />}
-      {currentTab === "Swap" && <Swap marketPrice={marketPrice} coin={coin} />}
-      {currentTab === "Seconds" && <Seconds marketPrice={marketPrice} coin={coin} />}
+      {!isMarketDataLoaded && <p className="w-full text-center">Loading market data... Please wait.</p>}
+      {isMarketDataLoaded && currentTab === "Spot" && <Spot marketPrice={marketPrice} coin={coin} />}
+      {isMarketDataLoaded && currentTab === "Swap" && <Swap marketPrice={marketPrice} coin={coin} />}
+      {isMarketDataLoaded && currentTab === "Seconds" && <Seconds marketPrice={marketPrice} coin={coin} />}
       <Navbar />
     </main>
   );

@@ -81,9 +81,12 @@ export const Spot = ({ marketPrice, coin }: SpotProps) => {
       tradeType: tradeAction,
       fromCurrency: tradeAction === "buy" ? "USDT" : coin,
       toCurrency: tradeAction === "buy" ? coin : "USDT",
-      amount: amount || 0,
+      amount: amount || 0, // Include 'amount' as required by the Trade type
+      principalAmount: amount || 0, // Include 'principalAmount' as required by the Trade type
+      profitAmount: 0, // Include 'profitAmount' as required by the Trade type
       expectedPrice: marketPrice,
-      tradeMode: "Spot" as const, // Add tradeMode
+      tradeMode: "Spot" as const,
+      status: "pending" as const,
     };
     submitTrade(newTrade, setAmount);
   };
@@ -262,7 +265,7 @@ export const Spot = ({ marketPrice, coin }: SpotProps) => {
             filter="pending"
             title="Pending Trades"
             coin={coin}
-            tradeMode="Spot" // Pass tradeMode
+            tradeMode="Spot"
           />
         ) : (
           <TradeList
@@ -270,7 +273,7 @@ export const Spot = ({ marketPrice, coin }: SpotProps) => {
             filter="completed"
             title="Trade Records"
             coin={coin}
-            tradeMode="Spot" // Pass tradeMode
+            tradeMode="Spot"
           />
         )}
       </section>

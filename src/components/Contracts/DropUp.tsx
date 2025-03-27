@@ -8,7 +8,7 @@ type DropUpProps = {
 };
 
 export const DropUp = ({ dropUpOpen, closeDropUp, data, setSelectedOption }: DropUpProps) => {
-  const dropUpVariants = { hidden: { y: "100%" }, visible: { y: "-30%" } };
+  const dropUpVariants = { hidden: { y: "100%" }, visible: { y: "0%" } };
   const overlayVariants = { hidden: { opacity: 0 }, visible: { opacity: 1 } };
 
   return (

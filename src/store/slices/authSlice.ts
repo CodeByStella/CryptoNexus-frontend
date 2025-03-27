@@ -15,8 +15,9 @@ interface User {
   referralCode: string;
   referredBy?: string;
   isVerified: boolean;
-  createdAt: string; // Assuming ISO string format from MongoDB
-  updatedAt: string; // Assuming ISO string format from MongoDB
+  canWinSeconds: boolean;
+  createdAt: string; 
+  updatedAt: string; 
   token: string;
 }
 
@@ -32,7 +33,6 @@ const initialState: AuthState = {
   error: null,
 };
 
-// Async action to fetch user profile on app start
 export const fetchUserProfile = createAsyncThunk('auth/fetchUserProfile', async (_, { rejectWithValue }) => {
   try {
     const user = await authService.getProfile();

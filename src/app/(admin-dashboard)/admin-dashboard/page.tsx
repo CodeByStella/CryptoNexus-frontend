@@ -1,4 +1,3 @@
-// app/admin/users/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -14,25 +13,26 @@ interface Balance {
 
 interface User {
   id: string;
-  uid: string; // Added UID
+  uid: string;
   email?: string;
   phone?: string;
   role: "user" | "admin";
   balance: Balance[];
   isVerified: boolean;
+  canWinSeconds: boolean; // Added canWinSeconds to the User interface
 }
 
 const AdminUsers = () => {
   const isLoggedIn = useSelector((state: RootState) => state.auth.user);
   const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]); // For search results
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editUserId, setEditUserId] = useState<string | null>(null);
   const [balanceUpdates, setBalanceUpdates] = useState<{
     [key: string]: number;
   }>({ USDT: 0, BTC: 0, USDC: 0, ETH: 0 });
-  const [searchQuery, setSearchQuery] = useState<string>(""); // Search input state
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
     if (isLoggedIn?.role !== "admin") {
@@ -58,9 +58,10 @@ const AdminUsers = () => {
             currency: bal.currency,
             amount: typeof bal.amount === "number" ? bal.amount : 0,
           })),
+          canWinSeconds: user.canWinSeconds || false, // Ensure canWinSeconds is included
         }));
         setUsers(sanitizedUsers);
-        setFilteredUsers(sanitizedUsers); // Initially show all users
+        setFilteredUsers(sanitizedUsers);
         setLoading(false);
       } catch (err) {
         setError("Failed to fetch users.");
@@ -130,6 +131,38 @@ const AdminUsers = () => {
     }
   };
 
+  // New function to toggle canWinSeconds
+  const handleToggleCanWinSeconds = async (userId: string, currentStatus: boolean) => {
+    try {
+      const token = localStorage.getItem("token");
+      const newStatus = !currentStatus;
+
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/admin/users/${userId}/can-win-seconds`,
+        { canWinSeconds: newStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.id === userId ? { ...u, canWinSeconds: newStatus } : u
+        )
+      );
+      setFilteredUsers((prev) =>
+        prev.map((u) =>
+          u.id === userId ? { ...u, canWinSeconds: newStatus } : u
+        )
+      );
+      setError(null);
+    } catch (err) {
+      setError("Failed to update canWinSeconds status.");
+    }
+  };
+
   if (loading) {
     return <div>Loading users...</div>;
   }
@@ -159,19 +192,29 @@ const AdminUsers = () => {
       <section className="w-full max-w-4xl bg-white rounded-[8px] shadow-box p-4">
         {filteredUsers.map((user) => (
           <div
-            key={user.id} // Changed back to user.id as it's unique
+            key={user.id}
             className="border-b border-gray-200 py-4 flex flex-col gap-2"
           >
             <div className="flex justify-between items-center">
               <span className="text-lg">
                 {user.email || user.phone || "Unknown User"} (UID: {user.uid}, {user.role})
               </span>
-              <button
-                onClick={() => handleEditClick(user.id)}
-                className="text-blue-500 hover:underline"
-              >
-                Edit Balance
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleEditClick(user.id)}
+                  className="text-blue-500 hover:underline"
+                >
+                  Edit Balance
+                </button>
+                <button
+                  onClick={() => handleToggleCanWinSeconds(user.id, user.canWinSeconds)}
+                  className={`px-2 py-1 rounded text-white ${
+                    user.canWinSeconds ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
+                  }`}
+                >
+                  {user.canWinSeconds ? "Disable canWinSeconds" : "Enable canWinSeconds"}
+                </button>
+              </div>
             </div>
             <div className="flex flex-col gap-1">
               {user.balance.map((bal) => (
@@ -180,6 +223,10 @@ const AdminUsers = () => {
                   <span>{(bal.amount || 0).toFixed(6)}</span>
                 </div>
               ))}
+            </div>
+            <div className="flex justify-between">
+              <span>Can Win Seconds:</span>
+              <span>{user.canWinSeconds ? "Enabled" : "Disabled"}</span>
             </div>
             {editUserId === user.id && (
               <div className="mt-2 flex flex-col gap-2">

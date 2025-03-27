@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+"use client";
+
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import Image from "next/image";
 import PriceTable from "@/components/PriceTable/PriceTable";
 import { useTrades } from "@/hooks/useTrade";
@@ -7,6 +9,7 @@ import { TradeList } from "./TradeList";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import axios from "axios";
+import { FaClock } from "react-icons/fa";
 
 type SecondsProps = { marketPrice: number; coin: string };
 
@@ -25,32 +28,49 @@ export const Seconds = ({ marketPrice, coin }: SecondsProps) => {
   const [tradeStatus, setTradeStatus] = useState<"Running" | "Completed">("Running");
   const [tradeResult, setTradeResult] = useState<"Win" | "Loss" | null>(null);
   const [requestId, setRequestId] = useState<string | null>(null);
-  const { trades, submitTrade, fetchTrades } = useTrades();
+  const [profit, setProfit] = useState<number | null>(null);
+  const { trades, fetchTrades } = useTrades();
   const isLoggedIn = useSelector((state: RootState) => state.auth.user);
 
-  const deliveryOptions = [
-    { time: "30s", profit: 6, limit: { min: 500, max: 9999999 } },
-    { time: "60s", profit: 9, limit: { min: 5000, max: 9999999 } },
-    { time: "90s", profit: 13, limit: { min: 30000, max: 9999999 } },
-    { time: "120s", profit: 16, limit: { min: 50000, max: 9999999 } },
-    { time: "180s", profit: 21, limit: { min: 80000, max: 9999999 } },
-    { time: "300s", profit: 28, limit: { min: 100000, max: 9999999 } },
-  ];
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const requestIdRef = useRef<string | null>(null);
+
+  const deliveryOptions = useMemo(
+    () => [
+      { time: "30s", profit: 6, limit: { min: 500, max: 9999999 } },
+      { time: "60s", profit: 9, limit: { min: 5000, max: 9999999 } },
+      { time: "90s", profit: 13, limit: { min: 30000, max: 9999999 } },
+      { time: "120s", profit: 16, limit: { min: 50000, max: 9999999 } },
+      { time: "180s", profit: 21, limit: { min: 80000, max: 9999999 } },
+      { time: "300s", profit: 28, limit: { min: 100000, max: 9999999 } },
+      { time: "30s", profit: 6, limit: { min: 500, max: 9999999 } },
+      { time: "60s", profit: 9, limit: { min: 5000, max: 9999999 } },
+    ],
+    []
+  );
 
   const dropUpData: string[] = deliveryOptions.map((option) => option.time);
   const [selectedOption, setSelectedOption] = useState<string>(dropUpData[0]);
 
-  const openDropup = () => setDropupOpen(true);
-  const closeDropUp = () => setDropupOpen(false);
+  const openDropup = useCallback(() => setDropupOpen(true), []);
+  const closeDropUp = useCallback(() => setDropupOpen(false), []);
 
-  const selectedProfit =
-    deliveryOptions.find((option) => option.time === selectedOption)?.profit || 6;
+  const selectedProfit = useMemo(
+    () => deliveryOptions.find((option) => option.time === selectedOption)?.profit || 6,
+    [selectedOption, deliveryOptions]
+  );
 
-  const selectedLimit =
-    deliveryOptions.find((option) => option.time === selectedOption)?.limit ||
-    deliveryOptions[0].limit;
+  const selectedLimit = useMemo(
+    () =>
+      deliveryOptions.find((option) => option.time === selectedOption)?.limit ||
+      deliveryOptions[0].limit,
+    [selectedOption, deliveryOptions]
+  );
 
-  const deliveryTimeSeconds = parseInt(selectedOption.replace("s", ""));
+  const deliveryTimeSeconds = useMemo(
+    () => parseInt(selectedOption.replace("s", "")),
+    [selectedOption]
+  );
 
   const defaultBalance = [
     { currency: "USDT", amount: 0 },
@@ -61,15 +81,15 @@ export const Seconds = ({ marketPrice, coin }: SecondsProps) => {
   const userBalance = isLoggedIn?.balance?.length ? isLoggedIn.balance : defaultBalance;
   const usdtBalance = userBalance.find((bal) => bal.currency === "USDT")?.amount || 0;
 
-  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSliderChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = parseInt(e.target.value);
     setValue(newValue);
     const newAmount = (newValue / 100) * usdtBalance;
     setAmount(newAmount);
     setErrorMessage(null);
-  };
+  }, [usdtBalance]);
 
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAmountChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const newAmount = parseFloat(e.target.value) || 0;
     setAmount(newAmount);
     if (usdtBalance > 0) {
@@ -79,170 +99,233 @@ export const Seconds = ({ marketPrice, coin }: SecondsProps) => {
       setValue(0);
     }
     setErrorMessage(null);
-  };
+  }, [usdtBalance]);
 
-  const handleSubmit = async (tradeType: "buy" | "sell") => {
-    setErrorMessage(null);
-    if (amount < selectedLimit.min || amount > selectedLimit.max) {
-      setErrorMessage(`Amount must be between ${selectedLimit.min} and ${selectedLimit.max} USDT`);
-      return;
+  const stopTimer = useCallback(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
     }
-    if (usdtBalance < amount) {
-      setErrorMessage("Not enough USDT balance");
-      return;
-    }
-    if (amount <= 0) {
-      setErrorMessage("Amount must be greater than 0");
-      return;
-    }
+  }, []);
 
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setErrorMessage("Authentication token not found! Please log in again. 😓");
+  const setRequestIdAndRef = useCallback((id: string | null) => {
+    setRequestId(id);
+    requestIdRef.current = id;
+  }, []);
+
+  const handleTimeout = useCallback(async () => {
+    if (!requestIdRef.current) {
+      setErrorMessage("Trade request ID is missing.");
+      setTradeStatus("Completed");
+      setTradeResult("Loss");
+      setProfit(null); // Don't set profit in error case
+      setAmount(0);
+      fetchTrades("completed", "Seconds");
       return;
     }
-
-    const tradeDate = new Date().toISOString().replace("T", " ").slice(0, 19);
-    const tradeDetails = {
-      tradeType,
-      fromCurrency: "USDT",
-      toCurrency: coin,
-      amount: amount || 0,
-      openPrice: marketPrice,
-      deliveryPrice: marketPrice,
-      tradeDate,
-      deliveryTime: deliveryTimeSeconds,
-    };
 
     try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setErrorMessage("Authentication token not found.");
+        setTradeStatus("Completed");
+        setTradeResult("Loss");
+        setProfit(null); // Don't set profit in error case
+        setAmount(0);
+        fetchTrades("completed", "Seconds");
+        setShowModal(false);
+        setCurrentTrade(null);
+        setRequestIdAndRef(null);
+        return;
+      }
+
       const response = await axios.post(
-        `${BACKEND_URL}/api/request-seconds`,
-        { seconds: deliveryTimeSeconds, amount },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        `${BACKEND_URL}/api/seconds/${requestIdRef.current}/timeout`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      setRequestId(response.data.requestId);
-      setCurrentTrade(tradeDetails);
-      setShowModal(true);
-      setTimer(deliveryTimeSeconds);
-      setTradeStatus("Running");
-      setTradeResult(null);
+
+      setTradeStatus("Completed");
+      if (response.data.status === "completed") {
+        setTradeResult("Win");
+        setProfit(response.data.profit); // Use profit directly from backend
+      } else {
+        setTradeResult("Loss");
+        setProfit(response.data.profit); // Use profit directly from backend
+      }
+      setAmount(0);
+      fetchTrades("completed", "Seconds");
     } catch (error: any) {
-      setErrorMessage(error.response?.data?.message || "Failed to submit seconds request");
+      setErrorMessage("Failed to process trade timeout.");
+      setTradeStatus("Completed");
+      setTradeResult("Loss");
+      setProfit(null); // Don't set profit in error case
+      setAmount(0);
+      fetchTrades("completed", "Seconds");
     }
-  };
+  }, [fetchTrades, setRequestIdAndRef]);
+
+  const startTimer = useCallback(
+    (duration: number) => {
+      stopTimer();
+      setTimer(duration);
+
+      const startTime = Date.now();
+      timerRef.current = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const remaining = Math.max(0, duration - elapsed);
+        setTimer(remaining);
+        if (remaining <= 0) {
+          stopTimer();
+          handleTimeout();
+        }
+      }, 1000);
+    },
+    [stopTimer, handleTimeout]
+  );
+
+  const handleSubmit = useCallback(
+    async (tradeType: "buy" | "sell") => {
+      setErrorMessage(null);
+
+      if (amount < selectedLimit.min || amount > selectedLimit.max) {
+        setErrorMessage(`Amount must be between ${selectedLimit.min} and ${selectedLimit.max} USDT`);
+        return;
+      }
+      if (usdtBalance < amount) {
+        setErrorMessage("Not enough USDT balance");
+        return;
+      }
+      if (amount <= 0) {
+        setErrorMessage("Amount must be greater than 0");
+        return;
+      }
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setErrorMessage("Please log in to continue.");
+        return;
+      }
+
+      const requestBody = {
+        seconds: deliveryTimeSeconds,
+        amount,
+        tradeType,
+        fromCurrency: "USDT",
+        toCurrency: coin,
+        openPrice: marketPrice,
+      };
+
+      const tradeDate = new Date().toISOString().replace("T", " ").slice(0, 19);
+      const tradeDetails = {
+        tradeType,
+        fromCurrency: "USDT",
+        toCurrency: coin,
+        amount: amount || 0,
+        openPrice: marketPrice,
+        deliveryPrice: marketPrice,
+        tradeDate,
+        deliveryTime: deliveryTimeSeconds,
+      };
+
+      try {
+        const response = await axios.post(
+          `${BACKEND_URL}/api/request-seconds`,
+          requestBody,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const requestIdFromServer = response.data.requestId;
+        if (!requestIdFromServer || typeof requestIdFromServer !== "string" || requestIdFromServer.trim() === "") {
+          throw new Error("Invalid requestId from server");
+        }
+        setRequestIdAndRef(requestIdFromServer);
+        setCurrentTrade(tradeDetails);
+        setShowModal(true);
+        setTradeStatus("Running");
+        setTradeResult(null);
+        startTimer(deliveryTimeSeconds);
+      } catch (error: any) {
+        setErrorMessage(error.response?.data?.message || "Failed to submit trade.");
+        setShowModal(false);
+        setCurrentTrade(null);
+        setRequestIdAndRef(null);
+        setTradeStatus("Running");
+        setTradeResult(null);
+      }
+    },
+    [
+      amount,
+      selectedLimit.min,
+      selectedLimit.max,
+      usdtBalance,
+      coin,
+      marketPrice,
+      deliveryTimeSeconds,
+      setRequestIdAndRef,
+      startTimer,
+    ]
+  );
 
   useEffect(() => {
-    if (!showModal || timer <= 0 || !currentTrade) return;
-  
-    const countdown = setInterval(() => {
-      setTimer((prev) => {
-        if (prev <= 1) {
-          if (tradeResult === null) {
-            setTradeResult("Loss");
-            setTradeStatus("Completed");
-            const token = localStorage.getItem("token");
-            if (token) {
-              axios
-                .post(
-                  `${BACKEND_URL}/api/seconds/${requestId}/timeout`,
-                  {},
-                  {
-                    headers: { Authorization: `Bearer ${token}` },
-                  }
-                )
-                .then(async () => {
-                  const profit = -currentTrade.amount;
-                  submitTrade(
-                    {
-                      tradeType: currentTrade.tradeType,
-                      fromCurrency: currentTrade.fromCurrency,
-                      toCurrency: currentTrade.toCurrency,
-                      amount: currentTrade.amount,
-                      expectedPrice: currentTrade.openPrice,
-                      tradeMode: "Seconds",
-                      profit,
-                    },
-                    setAmount
-                  );
-                })
-                .catch((error: any) => {
-                  setErrorMessage(error.response?.data?.message || "Failed to deduct balance on timeout");
-                });
-            }
-          }
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  
-    return () => clearInterval(countdown);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showModal, timer, tradeResult, requestId, currentTrade]);
+    const status = bottomTab === "Position" ? "pending" : "completed";
+    fetchTrades(status, "Seconds");
+  }, [bottomTab, fetchTrades]);
 
   useEffect(() => {
-    if (!showModal || timer <= 0 || !currentTrade) return;
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, []);
 
-    const countdown = setInterval(() => {
-      setTimer((prev) => {
-        if (prev <= 1) {
-          if (tradeResult === null) {
-            setTradeResult("Loss");
-            setTradeStatus("Completed");
-            const token = localStorage.getItem("token");
-            if (token) {
-              axios
-                .post(
-                  `${BACKEND_URL}/api/seconds/${requestId}/timeout`,
-                  {},
-                  {
-                    headers: { Authorization: `Bearer ${token}` },
-                  }
-                )
-                .then(async () => {
-                  const profit = -currentTrade.amount;
-                  submitTrade(
-                    {
-                      tradeType: currentTrade.tradeType,
-                      fromCurrency: currentTrade.fromCurrency,
-                      toCurrency: currentTrade.toCurrency,
-                      amount: currentTrade.amount,
-                      expectedPrice: currentTrade.openPrice,
-                      tradeMode: "Seconds",
-                      profit,
-                    },
-                    setAmount
-                  );
-                  // Removed balance update dispatch
-                })
-                .catch((error: any) => {
-                  setErrorMessage(error.response?.data?.message || "Failed to deduct balance on timeout");
-                });
-            }
-          }
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(countdown);
-  }, [showModal, timer, tradeResult, requestId, currentTrade, submitTrade]);
-
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
+    if (tradeStatus === "Running") {
+      setErrorMessage("Please wait for the trade to complete.");
+      return;
+    }
     setShowModal(false);
     setCurrentTrade(null);
-    setRequestId(null);
+    setRequestIdAndRef(null);
     setTimer(0);
     setTradeStatus("Running");
     setTradeResult(null);
     setAmount(0);
     setValue(0);
-    fetchTrades(); // Refresh trades when modal closes
+    fetchTrades(bottomTab === "Position" ? "pending" : "completed", "Seconds");
+    stopTimer();
+  }, [
+    tradeStatus,
+    bottomTab,
+    setRequestIdAndRef,
+    fetchTrades,
+    stopTimer,
+  ]);
+
+  const memoizedTrades = useMemo(() => trades, [trades]);
+
+  const renderProfitDisplay = () => {
+    if (tradeStatus === "Completed" && tradeResult && profit != null) {
+      if (profit === 0) return null;
+      return (
+        <div className="flex justify-center mb-4">
+          <span
+            className={`text-[30px] font-medium ${
+              tradeResult === "Win" ? "text-theme_green" : "text-theme_red"
+            }`}
+          >
+            {tradeResult === "Win" ? "+" : ""}
+            {profit.toFixed(2)} USDT
+          </span>
+        </div>
+      );
+    }
+    return null;
   };
 
   return (
@@ -296,10 +379,7 @@ export const Seconds = ({ marketPrice, coin }: SecondsProps) => {
               <span className="text-[silver] text-[12px] font-light">(*{selectedProfit}%)</span>
             </section>
             <span className="text-[11px] mb-[7px]">
-              Limit:{" "}
-              <span className="font-light text-theme_green">
-                {selectedLimit.min}-{selectedLimit.max}
-              </span>
+              Limit: <span className="font-light text-theme_green">{selectedLimit.min}-{selectedLimit.max}</span>
             </span>
           </section>
           <div className="w-full mb-[7px] rounded-[5px] py-[8px] px-[10px] flex justify-between items-center text-[14px] bg-[#F5F7FA]">
@@ -419,7 +499,7 @@ export const Seconds = ({ marketPrice, coin }: SecondsProps) => {
         </section>
         {bottomTab === "Position" ? (
           <TradeList
-            trades={trades}
+            trades={memoizedTrades}
             filter="pending"
             title="Pending Trades"
             coin={coin}
@@ -427,7 +507,7 @@ export const Seconds = ({ marketPrice, coin }: SecondsProps) => {
           />
         ) : (
           <TradeList
-            trades={trades}
+            trades={memoizedTrades}
             filter="completed"
             title="Trade Records"
             coin={coin}
@@ -437,112 +517,104 @@ export const Seconds = ({ marketPrice, coin }: SecondsProps) => {
       </section>
 
       {showModal && currentTrade && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-    <div className="bg-white p-4 rounded-lg shadow-lg w-[300px]">
-      <div className="flex justify-between items-center mb-2">
-        <h3 className="text-[14px] font-medium">{coin} Contracts</h3>
-        <button onClick={closeModal} className="text-gray-500">
-          ✕
-        </button>
-      </div>
-      <div className="flex justify-between items-center mb-2">
-        <span className="text-[12px] text-gray-500">{currentTrade.tradeDate}</span>
-        {tradeStatus === "Running" ? (
-          <div className="flex items-center">
-            <span className="text-[12px] text-blue-500 mr-1">Running</span>
-            <span className="w-2 h-2 bg-blue-500 rounded-full mr-1"></span>
-            <span className="text-[12px] text-blue-500">{timer}s</span>
-          </div>
-        ) : (
-          tradeResult && (
-            <div className="flex items-center">
-              <span className="text-[12px]">{tradeResult}</span>
-              <span
-                className={`text-[12px] ml-1 ${
-                  tradeResult === "Win" ? "text-theme_green" : "text-theme_red"
-                }`}
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-4 rounded-lg shadow-lg w-[300px]">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-[14px] font-medium">{coin} Contracts</h3>
+              <button onClick={closeModal} className="text-gray-500">✕</button>
+            </div>
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-[12px] text-gray-600">{currentTrade.tradeDate}</span>
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center">
+                  <FaClock className="text-blue-500 mr-1" />
+                  <span className="text-[12px] text-blue-500">
+                    {tradeStatus === "Running" ? timer : currentTrade.deliveryTime}
+                  </span>
+                </div>
+                {tradeStatus === "Running" ? (
+                  <div className="flex items-center">
+                    <span className="text-[12px] text-blue-500 mr-1">Running</span>
+                    <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                  </div>
+                ) : (
+                  tradeResult && (
+                    <div className="flex items-center">
+                      <span className={`text-[12px] ${tradeResult === "Win" ? "text-theme_green" : "text-theme_red"}`}>
+                        {tradeResult}
+                      </span>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+            {tradeStatus === "Running" ? (
+              <div className="flex justify-center mb-4">
+                <div className="relative w-12 h-12">
+                  <svg className="w-full h-full" viewBox="0 0 36 36">
+                    <path
+                      className="text-gray-200"
+                      fill="none"
+                      strokeWidth="3"
+                      stroke="currentColor"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <path
+                      className="text-blue-500"
+                      fill="none"
+                      strokeWidth="3"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeDasharray={`${(timer / (currentTrade?.deliveryTime || 1)) * 100}, 100`}
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center text-[12px] font-medium">
+                    {timer}s
+                  </div>
+                </div>
+              </div>
+            ) : (
+              renderProfitDisplay()
+            )}
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-[14px]">{currentTrade.amount} USDT</span>
+              <div className="flex items-center">
+                <figure className="relative w-[16px] h-[16px] mr-1">
+                  <Image
+                    src={
+                      currentTrade.tradeType === "buy"
+                        ? "/assets/images/Up.svg"
+                        : "/assets/images/Down.svg"
+                    }
+                    alt={currentTrade.tradeType === "buy" ? "Up image" : "Down image"}
+                    fill
+                  />
+                </figure>
+                <span
+                  className={`text-[12px] ${
+                    currentTrade.tradeType === "buy" ? "text-theme_green" : "text-theme_red"
+                  }`}
+                >
+                  {currentTrade.tradeType === "buy" ? "↑ Up" : "↓ Down"}
+                </span>
+              </div>
+            </div>
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-[12px] text-gray-600">Open: {currentTrade.openPrice.toFixed(4)}</span>
+              <span className="text-[12px] text-gray-600">Delivery: {currentTrade.deliveryPrice.toFixed(4)}</span>
+            </div>
+            {tradeStatus === "Completed" && (
+              <button
+                className="w-full mt-4 py-2 text-white bg-theme_green rounded text-[12px]"
+                onClick={closeModal}
               >
-                {tradeResult === "Win"
-                  ? `+${(currentTrade.amount * (selectedProfit / 100)).toFixed(2)}`
-                  : `-${currentTrade.amount.toFixed(2)}`}
-              </span>
-            </div>
-          )
-        )}
-      </div>
-      {tradeStatus === "Running" && (
-        <div className="flex justify-center mb-4">
-          <div className="relative w-12 h-12">
-            <svg className="w-full h-full" viewBox="0 0 36 36">
-              <path
-                className="text-gray-200"
-                fill="none"
-                strokeWidth="3"
-                stroke="currentColor"
-                d="M18 2.0845
-                  a 15.9155 15.9155 0 0 1 0 31.831
-                  a 15.9155 15.9155 0 0 1 0 -31.831"
-              />
-              <path
-                className="text-theme_green"
-                fill="none"
-                strokeWidth="3"
-                stroke="currentColor"
-                strokeLinecap="round" // Add stroke-linecap for smoother appearance
-                strokeDasharray={`${(timer / currentTrade.deliveryTime) * 100}, 100`}
-                d="M18 2.0845
-                  a 15.9155 15.9155 0 0 1 0 31.831
-                  a 15.9155 15.9155 0 0 1 0 -31.831"
-              />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center text-[12px] font-medium">
-              {timer}s
-            </div>
+                Create a new order
+              </button>
+            )}
           </div>
         </div>
       )}
-      <div className="flex justify-between items-center mb-2">
-        <span className="text-[12px]">{currentTrade.amount} USDT</span>
-        <div className="flex items-center">
-          <figure className="relative w-[16px] h-[16px] mr-1">
-            <Image
-              src={
-                currentTrade.tradeType === "buy"
-                  ? "/assets/images/Up.svg"
-                  : "/assets/images/Down.svg"
-              }
-              alt={currentTrade.tradeType === "buy" ? "Up image" : "Down image"}
-              fill
-            />
-          </figure>
-          <span
-            className={`text-[12px] ${
-              currentTrade.tradeType === "buy" ? "text-theme_green" : "text-theme_red"
-            }`}
-          >
-            {currentTrade.tradeType === "buy" ? "↑ Up" : "↓ Down"}
-          </span>
-        </div>
-      </div>
-      <div className="flex justify-between items-center mb-2">
-        <span className="text-[12px] text-gray-500">Open:</span>
-        <span className="text-[12px]">{currentTrade.openPrice.toFixed(4)}</span>
-      </div>
-      <div className="flex justify-between items-center mb-2">
-        <span className="text-[12px] text-gray-500">Delivery:</span>
-        <span className="text-[12px]">{currentTrade.deliveryPrice.toFixed(4)}</span>
-      </div>
-      {tradeStatus === "Completed" && (
-        <button
-          className="w-full mt-4 py-2 text-white bg-theme_green rounded text-[12px]"
-          onClick={closeModal}
-        >
-          Create a new order
-        </button>
-      )}
-    </div>
-  </div>
-)}
     </section>
   );
 };

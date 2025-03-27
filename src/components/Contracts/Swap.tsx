@@ -63,10 +63,11 @@ export const Swap = ({ marketPrice, coin }: SwapProps) => {
     return profit.toFixed(2);
   };
 
+
   const handleSubmit = () => {
     setErrorMessage(null);
     if (usdtBalance < amount) {
-      setErrorMessage("Not enough USDT balance");
+      setErrorMessage("Not enough balance");
       return;
     }
     if (amount <= 0) {
@@ -75,16 +76,17 @@ export const Swap = ({ marketPrice, coin }: SwapProps) => {
     }
     const newTrade = {
       tradeType: tradeAction,
-      fromCurrency: "USDT",
-      toCurrency: coin,
-      amount: amount || 0,
+      fromCurrency: tradeAction === "buy" ? "USDT" : coin,
+      toCurrency: tradeAction === "buy" ? coin : "USDT",
+      amount: amount || 0, // Include 'amount' as required by the Trade type
+      principalAmount: amount || 0, // Include 'principalAmount' as required by the Trade type
+      profitAmount: 0, // Include 'profitAmount' as required by the Trade type
       expectedPrice: marketPrice,
-      leverage,
-      tradeMode: "Swap" as const, // Specify tradeMode
+      tradeMode: "Swap" as const,
+      status: "pending" as const,
     };
     submitTrade(newTrade, setAmount);
   };
-
   const openDropup = () => setDropupOpen(true);
   const closeDropUp = () => setDropupOpen(false);
 

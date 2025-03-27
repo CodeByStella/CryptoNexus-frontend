@@ -18,6 +18,8 @@ export type MarketTicker = {
   // types.ts
 // types.ts
 export type Trade = {
+  profitAmount: number;
+  principalAmount: number;
   id: string;
   user?: string; // Make user optional since the backend can set it from the token
   tradeType: "buy" | "sell";
