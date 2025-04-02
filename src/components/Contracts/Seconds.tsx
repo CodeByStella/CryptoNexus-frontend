@@ -11,7 +11,7 @@ import { RootState } from "@/store";
 import axios from "axios";
 import { FaClock } from "react-icons/fa";
 
-type SecondsProps = { marketPrice: number; coin: string };
+type SecondsProps = { marketPrice: number; coin: string; };
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -143,6 +143,8 @@ export const Seconds = ({ marketPrice, coin }: SecondsProps) => {
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
+      console.log(response,"=====================> Response");
 
       setTradeStatus("Completed");
       if (response.data.status === "completed") {
@@ -314,9 +316,8 @@ export const Seconds = ({ marketPrice, coin }: SecondsProps) => {
       return (
         <div className="flex justify-center mb-4">
           <span
-            className={`text-[30px] font-medium ${
-              tradeResult === "Win" ? "text-theme_green" : "text-theme_red"
-            }`}
+            className={`text-[30px] font-medium ${tradeResult === "Win" ? "text-theme_green" : "text-theme_red"
+              }`}
           >
             {tradeResult === "Win" ? "+" : ""}
             {profit.toFixed(2)} USDT
@@ -481,16 +482,14 @@ export const Seconds = ({ marketPrice, coin }: SecondsProps) => {
               >
                 <span
                   onClick={() => setBottomTab(each)}
-                  className={`${i === 0 && "mr-[15px]"} mb-[8px] inline-block ${
-                    each === bottomTab ? `text-theme_green` : `text-black`
-                  }`}
+                  className={`${i === 0 && "mr-[15px]"} mb-[8px] inline-block ${each === bottomTab ? `text-theme_green` : `text-black`
+                    }`}
                 >
                   {each}
                 </span>
                 <div
-                  className={`${
-                    each === bottomTab ? `opacity-1` : `opacity-0`
-                  } w-[45px] h-[3px] bg-theme_green`}
+                  className={`${each === bottomTab ? `opacity-1` : `opacity-0`
+                    } w-[45px] h-[3px] bg-theme_green`}
                 ></div>
               </section>
             ))}
@@ -591,9 +590,8 @@ export const Seconds = ({ marketPrice, coin }: SecondsProps) => {
                   />
                 </figure>
                 <span
-                  className={`text-[12px] ${
-                    currentTrade.tradeType === "buy" ? "text-theme_green" : "text-theme_red"
-                  }`}
+                  className={`text-[12px] ${currentTrade.tradeType === "buy" ? "text-theme_green" : "text-theme_red"
+                    }`}
                 >
                   {currentTrade.tradeType === "buy" ? "↑ Up" : "↓ Down"}
                 </span>
@@ -601,7 +599,7 @@ export const Seconds = ({ marketPrice, coin }: SecondsProps) => {
             </div>
             <div className="flex justify-between items-center mb-2">
               <span className="text-[12px] text-gray-600">Open: {currentTrade.openPrice.toFixed(4)}</span>
-              <span className="text-[12px] text-gray-600">Delivery: {currentTrade.deliveryPrice.toFixed(4)}</span>
+              <span className="text-[12px] text-gray-600">Delivery: {currentTrade.deliveryPrice + (tradeResult === "Win":-profit ?)}</span>
             </div>
             {tradeStatus === "Completed" && (
               <button
