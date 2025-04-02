@@ -144,7 +144,7 @@ export const Seconds = ({ marketPrice, coin }: SecondsProps) => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log(response,"=====================> Response");
+      console.log(response, "=====================> Response");
 
       setTradeStatus("Completed");
       if (response.data.status === "completed") {
@@ -599,7 +599,7 @@ export const Seconds = ({ marketPrice, coin }: SecondsProps) => {
             </div>
             <div className="flex justify-between items-center mb-2">
               <span className="text-[12px] text-gray-600">Open: {currentTrade.openPrice.toFixed(4)}</span>
-              <span className="text-[12px] text-gray-600">Delivery: {currentTrade.deliveryPrice + (tradeResult === "Win":-profit ?)}</span>
+              <span className="text-[12px] text-gray-600">Delivery: {(currentTrade.deliveryPrice + (tradeResult === "Win" ? profit : -(profit || 0))).toFixed(3)}</span>
             </div>
             {tradeStatus === "Completed" && (
               <button
