@@ -37,14 +37,13 @@ export const Seconds = ({ marketPrice, coin }: SecondsProps) => {
 
   const deliveryOptions = useMemo(
     () => [
-      { time: "30s", profit: 6, limit: { min: 500, max: 9999999 } },
-      { time: "60s", profit: 9, limit: { min: 5000, max: 9999999 } },
-      { time: "90s", profit: 13, limit: { min: 30000, max: 9999999 } },
-      { time: "120s", profit: 16, limit: { min: 50000, max: 9999999 } },
-      { time: "180s", profit: 21, limit: { min: 80000, max: 9999999 } },
-      { time: "300s", profit: 28, limit: { min: 100000, max: 9999999 } },
-      { time: "30s", profit: 6, limit: { min: 500, max: 9999999 } },
-      { time: "60s", profit: 9, limit: { min: 5000, max: 9999999 } },
+      { time: "30s", profit: 12, limit: { min: 100, max: 100000 } },
+      { time: "60s", profit: 18, limit: { min: 10000, max: 1000000 } },
+      { time: "90s", profit: 25, limit: { min: 60000, max: 1000000 } },
+      { time: "180s", profit: 32, limit: { min: 150000, max: 1000000 } },
+      { time: "300s", profit: 45, limit: { min: 300000, max: 1000000 } },
+      { time: "30s", profit: 12, limit: { min: 100, max: 100000 } },
+      { time: "60s", profit: 18, limit: { min: 10000, max: 1000000 } },
     ],
     []
   );
