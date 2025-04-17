@@ -23,7 +23,7 @@ const Contracts = () => {
   const marketPrice = useMemo(() => currentTicker?.c || 0, [currentTicker?.c]);
   const coin = useMemo(() => currentTicker?.m || "BTC", [currentTicker?.m]);
 
-  const isMarketDataLoaded = marketPrice > 0;
+  const isMarketDataLoaded = marketPrice >= 0;
 
   return (
     <main className="font-[Inter] w-full min-h-screen flex flex-col justify-start items-center bg-white relative px-[15px] pb-[70px] pt-[12px]">

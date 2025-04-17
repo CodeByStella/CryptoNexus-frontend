@@ -38,7 +38,7 @@ const Mining = () => {
       </nav>
 
       {/* Section */}
-      <section className="w-full flex flex-col justify-start items-center font-light text-white bg-[#22A2B3] rounded-[4px] px-[12px] py-[8px]">
+      <section className="w-full flex flex-col justify-start items-center font-light text-white bg-[#0052FF] rounded-[4px] px-[12px] py-[8px]">
         <section className="w-full flex justify-between items-start">
           <section className="flex flex-col justify-start items-start">
             <section className="flex items-center">

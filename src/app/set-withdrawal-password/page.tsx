@@ -27,7 +27,7 @@ const SetWithdrawPassword = () => {
     }
 
     if (password !== confirmPassword) {
-      setError("Oops! Passwords don’t match. Try again! 🙈");
+      setError("Oops! Passwords don't match. Try again! 🙈");
       setIsSubmitting(false);
       return;
     }
@@ -59,7 +59,7 @@ const SetWithdrawPassword = () => {
       if (!response.ok) {
         throw new Error(data.message || "Failed to set password!");
       }
-      setSuccess("Password set! You’re all secure now! 🎉");
+      setSuccess("Password set! You're all secure now! 🎉");
       setPassword("");
       setConfirmPassword("");
 
@@ -81,7 +81,7 @@ const SetWithdrawPassword = () => {
         {/* Form Section */}
         <div className="bg-white p-4 rounded-lg">
           <p className="text-sm text-gray-700 mb-4">
-            Let’s set a password to keep your funds safe! 🤑
+            Let's set a password to keep your funds safe! 🤑
           </p>
 
           {/* Error/Success Messages */}
@@ -91,7 +91,7 @@ const SetWithdrawPassword = () => {
             </div>
           )}
           {success && (
-            <div className="bg-green-100 text-green-700 p-4 rounded-lg text-sm mb-4">
+            <div className="bg-[#0052FF]/10 text-[#0052FF] p-4 rounded-lg text-sm mb-4">
               {success}
             </div>
           )}

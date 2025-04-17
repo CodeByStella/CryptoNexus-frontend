@@ -367,7 +367,7 @@ const AdminSeconds = () => {
                     onClick={() => handleToggleCanWinSeconds(user.id, user.canWinSeconds)}
                     disabled={togglingUserId === user.id}
                     className={`px-2 py-1 rounded text-white ${
-                      user.canWinSeconds ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
+                      user.canWinSeconds ? "bg-red-500 hover:bg-red-600" : "bg-[#0052FF] hover:bg-[#0052FF]/90"
                     } ${togglingUserId === user.id ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     {togglingUserId === user.id

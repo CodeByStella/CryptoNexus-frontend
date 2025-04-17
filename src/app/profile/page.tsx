@@ -47,14 +47,14 @@ const UserProfile = () => {
           </div>
           <div className="flex items-center">
             <span className="text-sm text-gray-500">UID: {uid} </span>
-            <span className="text-sm font-bold text-green-600 ml-2">
+            <span className="text-sm font-bold text-[#0052FF] ml-2">
               Credit score: {creditScore}
             </span>
           </div>
         </div>
 
         {/* Security Improvement Banner */}
-        <div className="w-full bg-green-600 text-white p-3 rounded-lg flex justify-between items-center mb-6">
+        <div className="w-full bg-[#0052FF] text-white p-3 rounded-lg flex justify-between items-center mb-6">
           <span>Improve account security</span>
           <button className="text-white underline">View</button>
         </div>

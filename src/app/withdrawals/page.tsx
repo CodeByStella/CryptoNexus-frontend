@@ -115,7 +115,7 @@ const CryptoWithdrawalInterface = () => {
       return;
     }
     if (totalInUSDT === 0 || amount > totalInUSDT) {
-      setError("Insufficient balance! You don’t have enough USDT. 💸");
+      setError("Insufficient balance! You don't have enough USDT. 💸");
       setIsSubmitting(false);
       return;
     }
@@ -152,7 +152,7 @@ const CryptoWithdrawalInterface = () => {
       } else if (errorMessage === "Invalid withdrawal password") {
         setError("Invalid withdrawal password! Please try again.");
       } else if (errorMessage === "Insufficient balance") {
-        setError("Insufficient balance! You don’t have enough USDT.");
+        setError("Insufficient balance! You don't have enough USDT.");
       } else if (errorMessage === "User not found") {
         setError("User not found! Please log in again.");
       } else {
@@ -237,7 +237,7 @@ const CryptoWithdrawalInterface = () => {
           </div>
         )}
         {success && (
-          <div className="bg-green-100 text-green-700 p-4 rounded-lg text-sm">
+          <div className="bg-[#0052FF]/10 text-[#0052FF] p-4 rounded-lg text-sm">
             {success}
           </div>
         )}

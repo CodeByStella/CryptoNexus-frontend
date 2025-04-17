@@ -96,7 +96,7 @@ const Assets = () => {
                 </figure>
               </section>
 
-              <section className="w-full flex flex-col justify-center items-center rounded-[5px] bg-[#22A2B3] px-[16px] py-[12px]">
+              <section className="w-full flex flex-col justify-center items-center rounded-[5px] bg-[#0052FF] px-[16px] py-[12px]">
                 <section className="text-white w-full flex justify-between">
                   <section className="flex flex-col justify-start items-start">
                     <p className="text-[12px] opacity-[.5]">Spot (USDT)</p>
@@ -186,7 +186,7 @@ const Assets = () => {
                   <Image src={`/assets/icons/Open.jpg`} alt="Open icon" fill />
                 </figure>
               </nav>
-              <section className="mt-[60px] p-[20px] my-[12px] text-white w-[88%] rounded-[6px] flex flex-col justify-start items-start bg-[#22A2B3]">
+              <section className="mt-[60px] p-[20px] my-[12px] text-white w-[88%] rounded-[6px] flex flex-col justify-start items-start bg-[#0052FF]">
                 <span className="opacity-[.5] text-[13px]">
                   Total Assets (USDT)
                 </span>

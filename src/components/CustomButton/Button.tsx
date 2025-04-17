@@ -6,9 +6,10 @@ type props = {
   onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void | Promise<void>;
   bg?: string;
   type: "button" | "submit";
+  disabled?: boolean;
 };
 
-const CustomButton = ({ text, width, bg, onClick, type }: props) => {
+const CustomButton = ({ text, width, bg, onClick, type, disabled = false }: props) => {
   return (
     <button
       style={{ width: `${width}%` }}
@@ -18,9 +19,9 @@ const CustomButton = ({ text, width, bg, onClick, type }: props) => {
         }
       }}
       type={type}
-      className={`${
-        bg ? `bg-${bg}` : `bg-theme_green`
-      } rounded-[6px] py-[10px] text-white font-[Inter]`}
+      className={`${bg ? `bg-${bg}` : `bg-theme_green`
+        } rounded-[6px] py-[10px] text-white font-[Inter] ${disabled?"cursor-not-allowed":""}`}
+        disabled={disabled}
     >
       {text}
     </button>

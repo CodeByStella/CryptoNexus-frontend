@@ -209,7 +209,7 @@ const AdminUsers = () => {
                 <button
                   onClick={() => handleToggleCanWinSeconds(user.id, user.canWinSeconds)}
                   className={`px-2 py-1 rounded text-white ${
-                    user.canWinSeconds ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
+                    user.canWinSeconds ? "bg-red-500 hover:bg-red-600" : "bg-[#0052FF] hover:bg-[#0052FF]/90"
                   }`}
                 >
                   {user.canWinSeconds ? "Disable canWinSeconds" : "Enable canWinSeconds"}
@@ -246,7 +246,7 @@ const AdminUsers = () => {
                 <div className="flex gap-2 mt-2">
                   <button
                     onClick={() => handleSave(user.id)}
-                    className="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600"
+                    className="bg-[#0052FF] text-white px-4 py-1 rounded hover:bg-[#0052FF]/90"
                   >
                     Save
                   </button>

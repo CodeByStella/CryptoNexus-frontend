@@ -191,7 +191,7 @@ const Home: React.FC = () => {
           <section className="flex items-center">
             <p className="flex items-center">Notice</p>
             <div className="bg-black w-[1px] mx-[7px] h-[15px]"></div>
-            <span className="text-[#22A2B3]">Notice</span>
+            <span className="text-[#0052FF]">Notice</span>
           </section>
         </section>
         <figure className="w-[16px] h-[16px] relative">

@@ -191,7 +191,7 @@ const AdminDepositAddresses = () => {
         <div className="mb-8">
           <button 
             onClick={() => setShowAddTokenForm(!showAddTokenForm)}
-            className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition"
+            className="px-4 py-2 bg-[#0052FF] text-white rounded-md hover:bg-[#0052FF]/90 transition"
           >
             {showAddTokenForm ? 'Cancel' : 'Add New Token'}
           </button>
@@ -252,14 +252,14 @@ const AdminDepositAddresses = () => {
             <div className="flex justify-between mt-4">
               <button
                 onClick={handleAddNewChainAddress}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+                className="px-4 py-2 bg-[#0052FF] text-white rounded-md hover:bg-[#0052FF]/90 transition"
               >
                 Add Chain-Address Pair
               </button>
               <button
                 onClick={handleAddToken}
                 disabled={loading}
-                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition disabled:bg-gray-400"
+                className="px-4 py-2 bg-[#0052FF] text-white rounded-md hover:bg-[#0052FF]/90 transition disabled:bg-gray-400"
               >
                 {loading ? 'Saving...' : 'Save Token'}
               </button>
@@ -280,13 +280,13 @@ const AdminDepositAddresses = () => {
                     <div className="space-x-2">
                       <button
                         onClick={() => setEditingTokenId(null)}
-                        className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
+                        className="px-3 py-1 bg-[#0052FF] text-white rounded hover:bg-[#0052FF]/90 transition"
                       >
                         Cancel
                       </button>
                       <button
                         onClick={() => handleSaveChanges(depositAddress)}
-                        className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition"
+                        className="px-3 py-1 bg-[#0052FF] text-white rounded hover:bg-[#0052FF]/90 transition"
                       >
                         Save
                       </button>
@@ -294,7 +294,7 @@ const AdminDepositAddresses = () => {
                   ) : (
                     <button
                       onClick={() => setEditingTokenId(depositAddress._id)}
-                      className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                      className="px-3 py-1 bg-[#0052FF] text-white rounded hover:bg-[#0052FF]/90 transition"
                     >
                       Edit
                     </button>
@@ -363,7 +363,7 @@ const AdminDepositAddresses = () => {
                 {editingTokenId === depositAddress._id && (
                   <button
                     onClick={() => handleAddChainAddress(depositAddress._id)}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition mt-4"
+                    className="px-4 py-2 bg-[#0052FF] text-white rounded-md hover:bg-[#0052FF]/90 transition mt-4"
                   >
                     Add Chain-Address Pair
                   </button>

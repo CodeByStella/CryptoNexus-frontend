@@ -279,7 +279,7 @@ const Recharge = () => {
               type="button"
               onClick={handleCopyAddress}
               className={`flex items-center text-white rounded px-4 py-2 transition-colors duration-300 ${
-                copySuccess ? "bg-green-700" : "bg-theme_green"
+                copySuccess ? "bg-[#0052FF]" : "bg-theme_green"
               }`}
             >
               <Image src="/assets/images/Copy.png" alt="Copy" width={20} height={20} className="mr-2" />
@@ -295,7 +295,7 @@ const Recharge = () => {
                 onChange={(e) => setAmount(e.target.value)}
               />
               <p className="mt-2 text-sm">
-                ≈ <span className="text-green-500">{amount || "0"}</span> {selectedChain}
+                ≈ <span className="text-[#0052FF]">{amount || "0"}</span> {selectedChain}
               </p>
             </section>
 

@@ -300,7 +300,7 @@ const CustomerSupportChat = () => {
                 <div className="flex flex-col items-center mb-4">
                   <div className="relative w-12 h-12 bg-black rounded-full flex items-center justify-center text-white mb-2">
                     <span className="text-xl">Λ</span>
-                    <span className="absolute top-0 right-0 w-2 h-2 bg-green-500 rounded-full border-2 border-white"></span>
+                    <span className="absolute top-0 right-0 w-2 h-2 bg-[#0052FF] rounded-full border-2 border-white"></span>
                   </div>
                   <h2 className="text-lg font-bold">Online Help</h2>
                   <p className="text-xs text-gray-600">customer service</p>

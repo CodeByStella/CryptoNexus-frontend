@@ -8,6 +8,7 @@ export const useMarketData = () => {
 
   useEffect(() => {
     const handleTickerUpdate = (data: MarketTicker) => {
+      console.log(data,"handleTickerUpdate");
       setMarketTickers((prev) => {
         const index = prev.findIndex((p) => p.m === data.m);
         if (index !== -1) {

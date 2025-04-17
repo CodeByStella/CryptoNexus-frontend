@@ -198,7 +198,7 @@ export const Spot = ({ marketPrice, coin }: SpotProps) => {
                   appearance: none;
                   width: 17px;
                   height: 17px;
-                  background-color: #22A2B3;
+                  background-color: #0052FF;
                   border-radius: 50%;
                   cursor: pointer;
                   z-index: 10;
@@ -206,7 +206,7 @@ export const Spot = ({ marketPrice, coin }: SpotProps) => {
                 input[type="range"]::-moz-range-thumb {
                   width: 17px;
                   height: 17px;
-                  background-color: #22A2B3;
+                  background-color: #0052FF;
                   border-radius: 50%;
                   cursor: pointer;
                 }

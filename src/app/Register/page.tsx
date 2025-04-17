@@ -35,7 +35,7 @@ const CustomInput = ({
   );
 };
 
-const ErrorModal = ({ message, onClose }: { message: string; onClose: () => void }) => {
+const ErrorModal = ({ message, onClose }: { message: string; onClose: () => void; }) => {
   return (
     <div className="fixed inset-0 bg-transparent flex items-center justify-center z-50">
       <div className="bg-black rounded-lg p-2 w-fit max-w-md">
@@ -67,20 +67,20 @@ const Register = () => {
     name: "United States",
     code: "+1",
   });
-  
-  
+
+
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [showErrorModal, setShowErrorModal] = useState<boolean>(false);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    
+
     if (showErrorModal) {
       timer = setTimeout(() => {
         setShowErrorModal(false);
       }, 500);
     }
-    
+
     return () => {
       if (timer) {
         clearTimeout(timer);
@@ -100,7 +100,7 @@ const Register = () => {
         return false;
       }
     }
-    
+
     else if (mailOrPhone === "email") {
       if (!email.trim()) {
         setErrorMessage("Email is required");
@@ -112,7 +112,7 @@ const Register = () => {
         return false;
       }
     }
-    
+
     if (!password) {
       setErrorMessage("Password is required");
       setShowErrorModal(true);
@@ -122,7 +122,7 @@ const Register = () => {
       setShowErrorModal(true);
       return false;
     }
-    
+
     if (!cPassword) {
       setErrorMessage("Please confirm your password");
       setShowErrorModal(true);
@@ -132,23 +132,23 @@ const Register = () => {
       setShowErrorModal(true);
       return false;
     }
-    
+
     if (!termsChecked) {
       setErrorMessage("You must agree to the Terms of Service");
       setShowErrorModal(true);
       return false;
     }
-    
+
     return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     try {
       await authService.register({
         phone: mailOrPhone === "phone" ? phone : "",
@@ -156,8 +156,9 @@ const Register = () => {
         password,
         referralCode: inviteCode,
       });
-      
-      router.push("/Login"); 
+
+
+      router.push(`/Verify?email=${email}`);
     } catch (error: any) {
       setErrorMessage(error.message || "Registration failed. Please try again.");
       setShowErrorModal(true);
@@ -167,12 +168,12 @@ const Register = () => {
   return (
     <main className="font-[Inter] w-full min-h-screen flex flex-col justify-start items-center px-[20px] bg-[#4158FC] relative">
       {showErrorModal && (
-        <ErrorModal 
+        <ErrorModal
           message={errorMessage}
           onClose={() => setShowErrorModal(false)}
         />
       )}
-      
+
       <nav className="w-full flex justify-end items-center py-[15px]">
         <figure className="w-[22px] h-[22px] relative mr-[17px]">
           <Image src={"/assets/icons/Livechat.svg"} alt="Livechat icon" fill />
@@ -246,43 +247,43 @@ const Register = () => {
         />
 
         {mailOrPhone === "email" && <div className="w-full h-[15px]" />}
-        
+
         {mailOrPhone === "phone" && (
-          <CustomInput 
-            placeholder="Cell phone number" 
-            setValue={setPhone} 
-            type="text" 
+          <CustomInput
+            placeholder="Cell phone number"
+            setValue={setPhone}
+            type="text"
             value={phone}
           />
         )}
-        
+
         {mailOrPhone === "email" && (
-          <CustomInput 
-            placeholder="Email address" 
-            setValue={setEmail} 
-            type="text" 
+          <CustomInput
+            placeholder="Email address"
+            setValue={setEmail}
+            type="text"
             value={email}
           />
         )}
 
-        <CustomInput 
-          placeholder="Password" 
-          setValue={setPassword} 
-          type="password" 
+        <CustomInput
+          placeholder="Password"
+          setValue={setPassword}
+          type="password"
           value={password}
         />
-        
-        <CustomInput 
-          placeholder="Confirm password" 
-          setValue={setCPassword} 
-          type="password" 
+
+        <CustomInput
+          placeholder="Confirm password"
+          setValue={setCPassword}
+          type="password"
           value={cPassword}
         />
-        
-        <CustomInput 
-          placeholder="Invitation code (optional)" 
-          setValue={setInviteCode} 
-          type="text" 
+
+        <CustomInput
+          placeholder="Invitation code (optional)"
+          setValue={setInviteCode}
+          type="text"
           value={inviteCode}
         />
 

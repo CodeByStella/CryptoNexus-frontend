@@ -65,6 +65,34 @@ const authService = {
     const profile = await authService.getProfile();
     return profile.role === "admin";
   },
+
+  verifyOtp: async (email: string, otp: string) => {
+    const response = await fetch(`${API_BASE_URL}/api/auth/verify-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, otp }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || "OTP verification failed");
+    }
+    return data;
+  },
+
+  resendOtp: async (email: string) => {
+    const response = await fetch(`${API_BASE_URL}/api/auth/resend-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || "OTP resend failed");
+    }
+    return data;
+  }
 };
 
 export default authService;

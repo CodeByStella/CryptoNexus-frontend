@@ -131,7 +131,7 @@ const AdminWithdrawals = () => {
           </div>
         )}
         {success && (
-          <div className="bg-green-100 text-green-700 p-4 rounded-lg text-sm">
+          <div className="bg-[#0052FF]/10 text-[#0052FF] p-4 rounded-lg text-sm">
             {success}
           </div>
         )}
@@ -163,7 +163,7 @@ const AdminWithdrawals = () => {
               </div>
               <div className="flex justify-between">
                 <p className="text-sm text-gray-700">Status:</p>
-                <p className={`text-sm ${withdrawal.status === "pending" ? "text-yellow-500" : withdrawal.status === "approved" ? "text-green-500" : "text-red-500"}`}>
+                <p className={`text-sm ${withdrawal.status === "pending" ? "text-yellow-500" : withdrawal.status === "approved" ? "text-[#0052FF]" : "text-red-500"}`}>
                   {withdrawal.status}
                 </p>
               </div>

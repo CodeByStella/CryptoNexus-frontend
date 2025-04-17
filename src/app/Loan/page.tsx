@@ -16,7 +16,7 @@ const Loan = () => {
         </figure>
       </nav>
 
-      <section className="text-white w-full bg-[#22A2B3] flex flex-col justify-start items-start rounded-[7px] px-[11px] py-[25px]">
+      <section className="text-white w-full bg-[#0052FF] flex flex-col justify-start items-start rounded-[7px] px-[11px] py-[25px]">
         <span className="opacity-[.6] text-[12px]">Quota (USDT)</span>
         <p className="mt-[2px] text-[28px] font-medium">0</p>
       </section>

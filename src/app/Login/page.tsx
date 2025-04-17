@@ -110,8 +110,13 @@ const Login = () => {
       const redirectPath = user.isAdmin ? "/admin-dashboard" : "/";
       router.push(redirectPath);
     } catch (error: any) {
-      setErrorMessage(error.message || "Login failed. Please try again.");
-      setShowErrorModal(true);
+      console.log(error);
+      if (error.message === "Not-verified") {
+        router.push(`/Verify?email=${email}`);
+      } else {
+        setErrorMessage(error.message || "Login failed. Please try again.");
+        setShowErrorModal(true);
+      }
     }
   };
 

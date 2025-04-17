@@ -115,7 +115,7 @@ const Admin = () => {
                       : trade.status === "rejected"
                       ? "text-red-500"
                       : trade.status === "completed"
-                      ? "text-green-500"
+                      ? "text-[#0052FF]"
                       : "text-gray-500" // For cancelled
                   }`}
                 >
@@ -127,7 +127,7 @@ const Admin = () => {
                   <>
                     <button
                       onClick={() => handleTradeAction(trade.id, "accept")}
-                      className="flex-1 py-2 bg-theme_green text-white rounded-md text-sm font-medium hover:bg-green-700 transition"
+                      className="flex-1 py-2 bg-[#0052FF] text-white rounded-md text-sm font-medium hover:bg-[#0052FF]/90 transition"
                     >
                       Accept
                     </button>

@@ -35,12 +35,12 @@ const Navbar = () => {
             )}
           </figure>
           {each === "Home" && pathname.split("/")[1] === "" ? (
-            <span className="text-[#22A2B3]">{each}</span>
+            <span className="text-[#0052FF]">{each}</span>
           ) : (
             <span
               className={`${
                 pathname.split("/")[1] === each
-                  ? "text-[#22A2B3]"
+                  ? "text-[#0052FF]"
                   : "text-[#9CA2A8]"
               }`}
             >

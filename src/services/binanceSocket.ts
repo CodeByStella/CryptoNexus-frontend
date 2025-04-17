@@ -47,6 +47,8 @@ class MarketDataService {
     });
 
     this.socket.on('marketData', (data: { success: boolean; result: Record<string, any[]> }) => {
+
+      console.log(data,"marketData=========>");
       if (data.success) {
         // No caching - directly process and send to callbacks
         for (const key in data.result) {
